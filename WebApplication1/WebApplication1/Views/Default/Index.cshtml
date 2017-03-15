@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    string schemeListJson = ViewBag.SchemeListInJSON;
+    string schemePartsListJson = ViewBag.SchemePartsListInJSON;
+}
+
+<script>
+    window.schemeList = @Html.Raw(schemeListJson)
+    window.schemePartsList = @Html.Raw(schemePartsListJson)
+</script>
+
+
+<h2>Index</h2>
+
+<div id="root"></div>
+<script src="~/scripts/React/Release/vendor.js"></script>
+<script src="~/scripts/React/Release/index.js"></script>
+
+

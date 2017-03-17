@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities;
 using DataAccess.Context;
+using System.Data.Entity;
 
 namespace DataAccess.Repositories
 {
@@ -95,18 +96,35 @@ namespace DataAccess.Repositories
 
         public void DeleteScheme(int id)
         {
-            
-            var scheme = _context.Schemes.Find(id);
-            if(scheme != null)
-            {
-                _context.Schemes.Remove(scheme);
-                _context.SaveChanges();
-            }
+            var schemeTable = _context.Schemes;
+            List<Scheme> listToRemove = new List<Scheme>();
+            AddSchemesToListToRemove(id, listToRemove, schemeTable);
+            //var scheme = _context.Schemes.Find(id);
+            //if(scheme != null)
+            //{
+            //    _context.Schemes.Remove(scheme);
+            //    _context.SaveChanges();
+            //}
+
+            schemeTable.RemoveRange(listToRemove);
+            _context.SaveChanges();
         }
 
         public Scheme GetSchemeById(int id)
         {
             return _context.Schemes.Find(id);
+        }
+
+        void AddSchemesToListToRemove(int id, List<Scheme> listToRemove, DbSet<Scheme> tableInDb)
+        {
+            var schemeToRemove = tableInDb.Find(id);
+            listToRemove.Add(schemeToRemove);
+            var childsToRemove = schemeToRemove.Childs;
+            if(childsToRemove.Count > 0)
+            {
+                foreach (var child in childsToRemove)
+                    AddSchemesToListToRemove(child.Id, listToRemove, tableInDb);
+            }
         }
     }
 }

@@ -12,11 +12,11 @@ namespace BusinessLogic.DTO
         public int schemeId { get; set; }
         public IEnumerable<Part> parts { get; set; }
 
-        public SchemePartsDTO(int schemeId, IEnumerable<SchemePart> SchemePartList)
+        public SchemePartsDTO(int schemeId, IEnumerable<SchemePart> schemePartList)
         {
             this.schemeId = schemeId;
 
-            parts = SchemePartList
+            parts = schemePartList
                 .Where(schemePartPair => schemePartPair.SchemeId == schemeId)
                 .Select(schemePartPair => 
                 new Part { count = schemePartPair.Count,

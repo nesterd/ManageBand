@@ -42,13 +42,16 @@ class PartsCatalogue extends React.Component
         let list = this.state.schemeList.slice();
         if(schemeToDelete.parentId == null)
         {
+            let rootScheme =  list.find(x => x.id == schemeToDelete.id)
             list.splice(list.indexOf(schemeToDelete), 1)
         }
         else
         {
             let schema = this.findElement(schemeToDelete.parentId, list);
             let childsList = schema.childs;
-            childsList.splice(childsList.indexOf(schemeToDelete), 1);
+            let childScheme = childsList.find(x => x.id == schemeToDelete.id);
+            
+            childsList.splice(childsList.indexOf(childScheme), 1);
         }
         this.setState({ schemeList: list });
     }

@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTO\AddSchemePartDTO.cs" />
     <Compile Include="DTO\Part.cs" />
     <Compile Include="DTO\SchemePartsDTO.cs" />
     <Compile Include="DTO\SchemeDTO.cs" />

@@ -13,6 +13,7 @@ namespace BusinessLogic.DTO
         public string name { get; set; }
         public string image { get; set; }
         public bool isExpand { get; set; }
+        public int? parentId { get; set; }
         public IEnumerable<SchemeDTO> childs { get; set; }
 
         public SchemeDTO(Scheme scheme)
@@ -20,10 +21,12 @@ namespace BusinessLogic.DTO
             id = scheme.Id;
             name = scheme.Name;
             image = scheme.Image;
-            if (scheme.Childs.Count > 0)
-                childs = scheme.Childs.Select(child => new SchemeDTO(child)).ToList();
-            else
-                childs = new List<SchemeDTO>();
+            parentId = scheme.ParentId;
+            
+                if (scheme.Childs != null)
+                    childs = scheme.Childs.Select(child => new SchemeDTO(child)).ToList();
+                else
+                    childs = new List<SchemeDTO>();
 
             isExpand = false;
         }

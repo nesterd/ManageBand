@@ -58,5 +58,55 @@ namespace DataAccess.Repositories
         {
             return _context.Details.ToArray();
         }
+
+        public bool CheckDetail(string article)
+        {
+            return _context.Details.Any(detail => detail.Article == article);
+        }
+
+        public void AddDetail(Detail detail)
+        {
+            _context.Details.Add(detail);
+            _context.SaveChanges();
+        }
+
+        public void AddSchemePart(SchemePart schemePart)
+        {
+            _context.SchemeParts.Add(schemePart);
+            _context.SaveChanges();
+        }
+
+        public int GetDetailIdByArticle(string article)
+        {
+            return _context.Details.FirstOrDefault(detail => detail.Article == article).Id;
+        }
+
+        public void AddScheme(Scheme scheme)
+        {
+            
+            _context.Schemes.Add(scheme);
+            _context.SaveChanges();
+        }
+
+        public Scheme GetLastScheme()
+        {
+            return _context.Schemes.ToList().LastOrDefault();
+        }
+
+        public void DeleteScheme(int id)
+        {
+            
+            var scheme = _context.Schemes.Find(id);
+            if(scheme != null)
+            {
+                _context.Schemes.Remove(scheme);
+                _context.SaveChanges();
+            }
+        }
+
+        public Scheme GetSchemeById(int id)
+        {
+            return _context.Schemes.Find(id);
+        }
     }
 }

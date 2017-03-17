@@ -1,6 +1,8 @@
-﻿using BusinessLogic.Services;
+﻿using BusinessLogic.DTO;
+using BusinessLogic.Services;
 using BusinessLogic.Services.Base;
 using DataAccess.Context;
+using Domain.Entities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -30,9 +32,14 @@ namespace WebApplication1.Controllers
             return View();
         }
 
-        public ActionResult Get()
+        public ActionResult AddSchemePart()
         {
-            return Json(_schemeService.GetSchemeList(), JsonRequestBehavior.AllowGet);
+            var jsonString = new StreamReader(Request.InputStream).ReadToEnd();
+            var model = JsonConvert.DeserializeObject<AddSchemePartDTO>(jsonString);
+
+            _schemeService.AddSchemePart(model);
+
+            return Json(_schemeService.GetSchemePartList());
         }
 
         [HttpPost]
@@ -60,14 +67,36 @@ namespace WebApplication1.Controllers
         public ActionResult GetArticles()
         {
             var jsonString = new StreamReader(Request.InputStream).ReadToEnd();
-            var model = JsonConvert.DeserializeObject<Str>(jsonString);
+            var model = JsonConvert.DeserializeObject<string>(jsonString);
 
-            return Json(_schemeService.GetArticles(model.str));
+            return Json(_schemeService.GetArticles(model));
         }
 
-        class Str
+        [HttpPost]
+        public ActionResult AddScheme()
         {
-            public string str { get; set; }
+            var jsonString = new StreamReader(Request.InputStream).ReadToEnd();
+            var model = JsonConvert.DeserializeObject<Scheme>(jsonString);
+            _schemeService.AddScheme(model);
+
+            return Json(_schemeService.GetLastScheme());
+        }
+
+        //[HttpPost]
+        //public ActionResult EditScheme()
+        //{
+
+        //}
+
+        [HttpPost]
+        public ActionResult DeleteScheme()
+        {
+            var jsonString = new StreamReader(Request.InputStream).ReadToEnd();
+            var model = JsonConvert.DeserializeObject<int>(jsonString);
+            var schemeToDelete = _schemeService.GetSchemeById(model);
+            _schemeService.DeleteScheme(model);
+
+            return Json(schemeToDelete);
         }
 
     }

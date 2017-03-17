@@ -23,6 +23,8 @@ class PartsCatalogue extends React.Component
         this.handleOnExpand = this.handleOnExpand.bind(this);
         this.handleOnSelect = this.handleOnSelect.bind(this);
         this.onEditPart = this.onEditPart.bind(this);
+        this.onEditScheme = this.onEditScheme.bind(this);
+        this.onDeleteScheme = this.onDeleteScheme.bind(this);
     }
 
     onEditPart(newSchemePartsList)
@@ -32,7 +34,41 @@ class PartsCatalogue extends React.Component
         // schemeParts.parts = newSchemePartsList.parts;
         // let part = schemeParts.parts.find(prt => prt.schemePartId == schemePartId);
         // part.count = newCount;
-        this.setState({schemaParts : newSchemePartsList})
+        this.setState({schemaParts : newSchemePartsList});
+    }
+
+    onDeleteScheme(schemeToDelete)
+    {
+        let list = this.state.schemeList.slice();
+        if(schemeToDelete.parentId == null)
+        {
+            list.splice(list.indexOf(schemeToDelete), 1)
+        }
+        else
+        {
+            let schema = this.findElement(schemeToDelete.parentId, list);
+            let childsList = schema.childs;
+            childsList.splice(childsList.indexOf(schemeToDelete), 1);
+        }
+        this.setState({ schemeList: list });
+    }
+
+    onEditScheme(newScheme)
+    {
+        let list = this.state.schemeList.slice();
+        if(newScheme.parentId == null)
+        {
+            list.push(newScheme)
+        }
+        else
+        {
+            let schema = this.findElement(newScheme.parentId, list);
+            schema.childs.push(newScheme);
+            schema.isExpand = true;
+
+        }
+        this.setState({ schemeList: list });
+        // this.setState({schemeList : newSchemeList});
     }
 
     findElement(id, someList) {
@@ -69,7 +105,9 @@ class PartsCatalogue extends React.Component
                    <SchemeListBlock schemeList={this.state.schemeList}
                                     isAdmin ={this.state.isAdmin} 
                                     onExpand={this.handleOnExpand} 
-                                    onSelect={this.handleOnSelect} 
+                                    onSelect={this.handleOnSelect}
+                                    onEditScheme = {this.onEditScheme}
+                                    onDeleteScheme = {this.onDeleteScheme} 
                                     selectedSchemeId={this.state.selectedScheme != undefined ? this.state.selectedScheme.id : null }/>
     
                    {this.state.selectedScheme!= undefined ? <SchemeInfoBlock selctedSchemeImage = {this.state.selectedScheme.image}
@@ -80,23 +118,287 @@ class PartsCatalogue extends React.Component
                                                                              schemeParts={this.state.schemaParts.find(pts => pts.schemeId == this.state.selectedScheme.id)}
                                                                              /> : 
                                                             null} 
-                </div>
+              </div>
     }
 }
-{/*<div className="col-md-8">
 
-        <Parts selectedSchemeId={this.state.selectedScheme.id} schemaParts={this.state.schemaParts.find(pts => pts.schemeId == this.state.selectedScheme.id) } />
-        <Image selectedScheme={this.state.selectedScheme} />
+class SchemeListBlock extends React.Component
+{
+    constructor(props)
+    {
+        super(props);
+        this.state =
+        {
+            isAdmin : this.props.isAdmin,
+            isRootScheme : false,
+            AddSchemeModalShow : false,
+            EditSchemeModalShow : false,
+            DeleteSchemeModalShow : false
 
-    </div>*/}
-const SchemeListBlock = (props) => <div className ="col-md-4">
-                                         <SchemeList schemeList={props.schemeList}
-                                                     onExpand={props.onExpand}
-                                                     onSelect={props.onSelect}
-                                                     selectedSchemeId={props.selectedSchemeId } />
-                                   </div>;
+
+        }
+        this.close = this.close.bind(this);
+        this.onConfirmAddScheme = this.onConfirmAddScheme.bind(this);
+        this.onConfirmDeleteScheme = this.onConfirmDeleteScheme.bind(this);
+        this.onAddRootSchemeButtonClick = this.onAddRootSchemeButtonClick.bind(this);
+        this.onAddSchemeButtonClick = this.onAddSchemeButtonClick.bind(this);
+        this.onEditSchemeButtonClick = this.onEditSchemeButtonClick.bind(this);
+        this.onDeleteSchemeButtonClick = this.onDeleteSchemeButtonClick.bind(this);
+        this.ajaxSchemeRequest = this.ajaxSchemeRequest.bind(this);
+    }
+
+    ajaxSchemeRequest(actionName, item, method)
+    {
+        var self = this;
+        var path = '/Default/'+actionName;
+
+        fetch(path, { 
+            method  : 'post', 
+            body : JSON.stringify(item)
+        })
+        .then(function(response)
+        {
+            if(response.ok)
+            {
+                return response.json();
+            }
+            throw new Error('Network response was not ok.');
+            
+        })
+        .then(function(json){
+            {
+                self.close();
+                method(json);
+            }
+            
+        })
+        .catch(function(error) {
+         console.log('There has been a problem with your fetch operation: ' + error.message);});
+    }
+
+    onConfirmAddScheme(name, parentSchemeId)
+    {
+        this.ajaxSchemeRequest('AddScheme', {name : name, parentId : parentSchemeId}, this.props.onEditScheme);
+    }
+
+    onConfirmDeleteScheme(id)
+    {
+        this.ajaxSchemeRequest('DeleteScheme', id, this.props.onDeleteScheme);
+    }
+
+    onAddRootSchemeButtonClick()
+    {
+        this.setState
+        ({
+            isRootScheme : true,
+            AddSchemeModalShow : true,
+            Scheme : {name : '', id : 0},
+        });
+    }
+
+    onAddSchemeButtonClick(name, index)
+    {
+        this.setState
+        ({
+            isRootScheme : false,
+            AddSchemeModalShow : true,
+            Scheme : {name : name, id : index},
+        });
+    }
+
+    onEditSchemeButtonClick(name, index)
+    {
+        this.setState
+        ({
+            EditSchemeModalShow : true,
+            Scheme : {name : name, id : index},
+        });
+    }
+
+    onDeleteSchemeButtonClick(name, index)
+    {
+        this.setState
+        ({
+            DeleteSchemeModalShow : true,
+            Scheme : {name : name, id : index},
+        });
+    }
+
+    close()
+    {
+        this.setState
+        ({
+            Scheme : null,
+            AddSchemeModalShow : false,
+            EditSchemeModalShow : false,
+            DeleteSchemeModalShow : false
+        }); 
+    }
+
+    render()
+    {
+        return <div className ="col-md-4">
+                    {this.state.isAdmin ? <AddRootSchemeButton onAddRootSchemeButtonClick = {this.onAddRootSchemeButtonClick} /> : null}
+                    {this.state.Scheme == null ? null : <DeleteSchemeModal show={this.state.DeleteSchemeModalShow}
+                                                                                   onConfirmDeleteScheme = {this.onConfirmDeleteScheme}
+                                                                                   onClose={this.close}
+                                                                                   name = {this.state.Scheme.name}
+                                                                                   id = {this.state.Scheme.id}/>}
+                    {this.state.Scheme == null ? null : <EditSchemeModal show={this.state.EditSchemeModalShow}
+                                                                                   onClose={this.close}
+                                                                                   name = {this.state.Scheme.name}
+                                                                                   id = {this.state.Scheme.id}/>}
+                    {this.state.Scheme == null ? null : <AddSchemeModal show={this.state.AddSchemeModalShow}
+                                                                                   onClose={this.close}
+                                                                                   onConfirmAddScheme = {this.onConfirmAddScheme}
+                                                                                   isRootScheme = {this.state.isRootScheme}
+                                                                                   parentSchemeName = {this.state.Scheme.name}
+                                                                                   parentSchemeId = {this.state.Scheme.id}/>}
+                    
+                    <SchemeList schemeList={this.props.schemeList}
+                                onExpand={this.props.onExpand}
+                                onAddSchemeButtonClick = {this.onAddSchemeButtonClick}
+                                onEditSchemeButtonClick = {this.onEditSchemeButtonClick}
+                                onDeleteSchemeButtonClick ={this.onDeleteSchemeButtonClick}
+                                isAdmin = {this.state.isAdmin}
+                                onSelect={this.props.onSelect}
+                                selectedSchemeId={this.props.selectedSchemeId } />
+               </div>
+    }
+}
+
+class AddSchemeModal extends React.Component
+{
+    constructor(props)
+    {
+        super(props);
+        this.state =
+        {
+            name : ''
+        }
+        this.onChangeName = this.onChangeName.bind(this);
+        this.onClose = this.onClose.bind(this);
+        this.onConfirm = this.onConfirm.bind(this);
+    }
+
+    onConfirm()
+    {
+        let parentSchemeId = (this.props.isRootScheme ? null : this.props.parentSchemeId);
+        this.props.onConfirmAddScheme(this.state.name, parentSchemeId)
+        this.setState
+        ({
+            name : ''
+        });
+    }
+
+    onClose()
+    {
+        this.props.onClose();
+        this.setState
+        ({
+            name : ''
+        });
+    }
+
+    onChangeName(event)
+    {
+        
+        this.setState
+        ({
+            name : event.target.value
+        });
+    }
 
 
+
+    render()
+    {
+        return <Modal show ={this.props.show} onHide={this.onClose}>
+                    <Modal.Header closeButton>
+                            <Modal.Title>Добавление схемы</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h4>Название:</h4>
+                        <input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
+                        <p>{this.props.isRootScheme ? "корневая схема" : "не корневая схема"}</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary"  onClick={this.onConfirm}>Подтвердить</button>
+                        <Button onClick={this.onClose}>Отмена</Button>
+                    </Modal.Footer>
+              </Modal>
+    }
+}
+
+class EditSchemeModal extends React.Component
+{
+    constructor(props)
+    {
+        super(props);
+        this.state =
+        {
+            name : this.props.name
+        }
+        this.onChangeName = this.onChangeName.bind(this);
+        this.onClose = this.onClose.bind(this);
+    }
+
+    onChangeName(event)
+    {
+        this.setState
+        ({
+            name : event.target.value
+        });
+
+    }
+
+    onClose()
+    {
+        this.props.onClose();
+        // this.setState
+        // ({
+        //     name : this.props.name
+        // });
+    }
+
+
+    render()
+    {
+        return <Modal show ={this.props.show} onHide={this.onClose}>
+                    <Modal.Header closeButton>
+                            <Modal.Title>Редактировать схему?</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h4>Название:</h4>
+                        <input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
+                        
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary"  onClick={this.onClose}>Подтвердить</button>
+                        <Button onClick={this.onClose}>Отмена</Button>
+                    </Modal.Footer>
+              </Modal>
+    }
+}
+
+const DeleteSchemeModal = (props) =>
+    <Modal show ={props.show} onHide={props.onClose}>
+        <Modal.Header closeButton>
+                <Modal.Title>Удалить схему?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <h4>Название:</h4>
+            <p>{props.name}</p>
+            <hr/>
+            <div className="alert alert-danger" role="alert">Внимание: удаление схемы повлечет за собой удаление всех дочерних схем!</div>
+        </Modal.Body>
+        <Modal.Footer>
+            <button className="btn btn-primary"  onClick={props.onConfirmDeleteScheme.bind(this, props.id)}>Подтвердить</button>
+            <Button onClick={props.onClose}>Отмена</Button>
+        </Modal.Footer>
+    </Modal>;
+
+const AddRootSchemeButton = (props) => <button type="button" className="btn btn-primary" onClick={props.onAddRootSchemeButtonClick}>Добавить схему</button>;
 
 class SchemeList extends React.Component
 {
@@ -104,12 +406,16 @@ class SchemeList extends React.Component
         return <ul style={{ listStyleType: "none" } }>
                    {this.props.schemeList.map(scheme =>
                        <Scheme name={scheme.name} 
-                               key={scheme.id} 
+                               key={scheme.id}
+                               isAdmin = {this.props.isAdmin} 
                                index={scheme.id}  
                                childs={scheme.childs} 
                                isExpand={scheme.isExpand}
                                onExpand={this.props.onExpand} 
-                               onSelect= {this.props.onSelect} 
+                               onSelect= {this.props.onSelect}
+                               onAddSchemeButtonClick = {this.props.onAddSchemeButtonClick}
+                               onEditSchemeButtonClick = {this.props.onEditSchemeButtonClick}
+                               onDeleteSchemeButtonClick ={this.props.onDeleteSchemeButtonClick} 
                                selectedSchemeId={this.props.selectedSchemeId} />)}
                </ul>
     };
@@ -127,13 +433,21 @@ class Scheme extends React.Component
 
      <SelectButton selectedSchemeId={this.props.selectedSchemeId}
                    name={this.props.name}
+                   isAdmin = {this.props.isAdmin} 
                    onSelect={this.props.onSelect}
+                   onAddSchemeButtonClick = {this.props.onAddSchemeButtonClick}
+                   onEditSchemeButtonClick = {this.props.onEditSchemeButtonClick}
+                   onDeleteSchemeButtonClick ={this.props.onDeleteSchemeButtonClick} 
                    index={this.props.index} />
 
     {this.props.isExpand ? 
     <SchemeList schemeList={this.props.childs} 
-                onSelect={this.props.onSelect} 
-                onExpand={this.props.onExpand} 
+                onSelect={this.props.onSelect}
+                isAdmin = {this.props.isAdmin} 
+                onExpand={this.props.onExpand}
+                onAddSchemeButtonClick = {this.props.onAddSchemeButtonClick}
+                onEditSchemeButtonClick = {this.props.onEditSchemeButtonClick}
+                onDeleteSchemeButtonClick ={this.props.onDeleteSchemeButtonClick} 
                 selectedSchemeId={this.props.selectedSchemeId} /> :
      null}
                  </li> 
@@ -146,14 +460,14 @@ class ExpandButton extends React.Component
     {
         return this.props.childs.length > 0 ? 
         <button type="button" 
-                className="btn btn-default btn-xs" 
+                className="btn btn-link btn-xs" 
                 aria-label="Left Align" 
                 onClick={this.props.onExpand.bind(this, this.props.index) }>
                 <span className={!this.props.isExpand ? "glyphicon glyphicon-plus" : "glyphicon glyphicon-minus"} 
                       aria-hidden="true">
                 </span> 
         </button> : 
-        null
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> 
     }
 }
 
@@ -161,18 +475,37 @@ class SelectButton extends React.Component
 {
     render()
     {
-        return <button type="button" 
-                       className={this.props.selectedSchemeId == this.props.index ? "btn btn-success" : "btn btn-default"} 
-                       aria-label="Left Align" 
-                       onClick={this.props.onSelect.bind(this, this.props.index) }>
-                       {this.props.name} 
-               </button>
+        return <div className="btn-group">
+                    <button type="button" 
+                            className={"btn btn-" + (this.props.selectedSchemeId == this.props.index ? "success" : "default") }
+                            aria-label="Left Align" 
+                            onClick={this.props.onSelect.bind(this, this.props.index) }>
+                            {this.props.name} 
+                    </button>
+                    {this.props.isAdmin ? <button type="button" 
+                                                  className={"btn btn-"+ (this.props.selectedSchemeId == this.props.index ? "success" : "default")+" dropdown-toggle"}
+                                                  data-toggle="dropdown" 
+                                                  aria-haspopup="true" 
+                                                  aria-expanded="false">
+                                            <span className="caret"></span>
+                                            <span className="sr-only">Toggle Dropdown</span>
+                                         </button>
+                    
+                                         :null}
+                    <ul className="dropdown-menu">
+                        <li><a href="#" onClick ={this.props.onAddSchemeButtonClick.bind(this, this.props.name, this.props.index)}>Добавить дочернюю схему</a></li>
+                        <li><a href="#" onClick ={this.props.onEditSchemeButtonClick.bind(this, this.props.name, this.props.index)}>Редактировать</a></li>
+                        <li role="separator" className="divider"></li>
+                        <li><a href="#" onClick ={this.props.onDeleteSchemeButtonClick.bind(this, this.props.name, this.props.index)}>Удалить</a></li>
+                    </ul>
+             </div>
     }
 }
 
 
 const SchemeInfoBlock = (props) => 
 <div className="col-md-8">
+    <h2>{props.selectedSchemeName}</h2>
     <PartListBlock isAdmin={props.isAdmin} 
                    onEditPart={props.onEditPart} 
                    schemeParts = {props.schemeParts} 
@@ -180,12 +513,6 @@ const SchemeInfoBlock = (props) =>
                    selectedSchemeName = {props.selectedSchemeName}/>
     <ImageBlock image ={props.selctedSchemeImage}/>
 </div>;
-
-/*const PartListBlock = (props) =>
-<div style = {{ height: 300}}>
-    <AddPartButton/>
-    {props.schemeParts == null ? <NoPartsMessage/> : <PartsTable/>}
-</div>*/
 
 class PartListBlock extends React.Component
 {
@@ -203,9 +530,11 @@ class PartListBlock extends React.Component
         this.onEditPartButtonClick = this.onEditPartButtonClick.bind(this);
         this.onDeletePartButtonClick = this.onDeletePartButtonClick.bind(this);
         this.onAddPartButtonClick = this.onAddPartButtonClick.bind(this);
+        this.ajaxRequest = this.ajaxRequest.bind(this);
         this.close = this.close.bind(this);
         this.onConfirmEdit = this.onConfirmEdit.bind(this);
         this.onConfirmDelete = this.onConfirmDelete.bind(this);
+        this.onConfirmAddSchemePart = this.onConfirmAddSchemePart.bind(this);
     }
 
     close()
@@ -214,7 +543,8 @@ class PartListBlock extends React.Component
         ({
             showAddModal : false,
             showEditModal : false,
-            showDeleteModal : false
+            showDeleteModal : false,
+            editedSchemePart : null
         });
     }
 
@@ -224,8 +554,6 @@ class PartListBlock extends React.Component
             ({
                 showAddModal : true
             });
-        
-    
     }
 
     onEditPartButtonClick(schemePartId)
@@ -250,14 +578,14 @@ class PartListBlock extends React.Component
             });
     }
 
-    
-
-    onConfirmDelete(schemePartId, selectedSchemeId)
+    ajaxRequest(actionName, item)
     {
         var self = this;
-        fetch('Default/DeletePart', { 
+        var path = '/Default/'+actionName;
+
+        fetch(path, { 
             method  : 'post', 
-            body : JSON.stringify({schemePartId : schemePartId, newCount : 0, schemeId : selectedSchemeId})
+            body : JSON.stringify(item)
         })
         .then(function(response)
         {
@@ -268,10 +596,10 @@ class PartListBlock extends React.Component
             throw new Error('Network response was not ok.');
             
         })
-        .then(function(response){
+        .then(function(json){
             {
                 self.close();
-                self.props.onEditPart(response);
+                self.props.onEditPart(json);
             }
             
         })
@@ -279,42 +607,30 @@ class PartListBlock extends React.Component
          console.log('There has been a problem with your fetch operation: ' + error.message);});
     }
 
-    onConfirmEdit(schemePartId, count, selectedSchemeId)
+    onConfirmAddSchemePart(article, name, count)
     {
-        var self = this;
-        fetch('Default/EditPart', { 
-            method  : 'post', 
-            body : JSON.stringify({schemePartId : schemePartId, newCount : count, schemeId : selectedSchemeId})
-        })
-        .then(function(response)
-        {
-            if(response.ok)
-            {
-                return response.json();
-            }
-            throw new Error('Network response was not ok.');
-            
-        })
-        .then(function(response){
-            {
-                self.close();
-                self.props.onEditPart(response);
-            }
-            
-        })
-        .catch(function(error) {
-         console.log('There has been a problem with your fetch operation: ' + error.message);});
+        this.ajaxRequest('AddSchemePart', {article : article, name : name, count : count, schemeId : this.props.selectedSchemeId});
+
+    }
+
+    onConfirmDelete(schemePartId)
+    {
+        this.ajaxRequest('DeletePart',{schemePartId : schemePartId, newCount : 0, schemeId : this.props.selectedSchemeId});
+    }
+
+    onConfirmEdit(schemePartId, count)
+    {
+        this.ajaxRequest('EditPart', {schemePartId : schemePartId, newCount : count, schemeId : this.props.selectedSchemeId});
     }
 
     render()
     {
         return <div style = {{ height: 300}}>
-                   {/*<Select.Async  multi ="true" onChange = {this.onChange} loadOptions ={this.getArticles} />*/}
                    {this.state.isAdmin ? <AddPartButton onAddPartButtonClick = {this.onAddPartButtonClick} /> : null}
                    <AddPartModal selectedSchemeName = {this.props.selectedSchemeName}
                                  onClose = {this.close}
-                                 show = {this.state.showAddModal}
-                                 selectedSchemeId = {this.props.selectedSchemeId}/>
+                                 onConfirmAddSchemePart ={this.onConfirmAddSchemePart}
+                                 show = {this.state.showAddModal}/>
                    {this.state.editedSchemePart != null ? <EditPartModal   show = {this.state.showEditModal}
                                                                            onClose = {this.close}
                                                                            onConfirmEdit = {this.onConfirmEdit}
@@ -336,7 +652,6 @@ class PartListBlock extends React.Component
                </div>  
     }
 }
-//<AddPartModal selectedSchemeName = {props.selectedSchemeName}/>
 
 class AddPartModal extends React.Component
 {
@@ -350,18 +665,21 @@ class AddPartModal extends React.Component
             name : '',
             count : 0,
         };
-        this.onChange = this.onChange.bind(this);
+        this.onChangeArticle = this.onChangeArticle.bind(this);
+        this.clear = this.clear.bind(this);
+        this.onConfirm = this.onConfirm.bind(this);
+        this.onChangeName = this.onChangeName.bind(this);
+        this.onChangeCount = this.onChangeCount.bind(this);
         this.getArticles =this.getArticles.bind(this);
         this.onClose = this.onClose.bind(this);
         this.onNewOptionClick = this.onNewOptionClick.bind(this);
-        // this.onValueClick = this.onValueClick.bind(this);
     }
 
     getArticles(input)
     {
-        return fetch('Default/GetArticles', { 
+        return fetch('/Default/GetArticles', { 
             method  : 'post', 
-            body : JSON.stringify({str : input})
+            body : JSON.stringify(input)
         })
         .then(function(response)
         {
@@ -382,9 +700,15 @@ class AddPartModal extends React.Component
          console.log('There has been a problem with your fetch operation: ' + error.message);});
     }
 
-    onClose()
+    onConfirm()
     {
-        this.props.onClose();
+        this.onClose();
+        this.props.onConfirmAddSchemePart(this.state.article.value, this.state.name, this.state.count);
+
+    }
+
+    clear()
+    {
         this.setState
         ({
             article : '',
@@ -394,27 +718,43 @@ class AddPartModal extends React.Component
         });
     }
 
-    
-
-    // onValueClick(value, event)
-    // {
-        
-    //     this.setState
-    //     ({
-    //         name : value.value
-    //     });
-    // }
-    
-    onChange(value)
+    onClose()
     {
+        this.props.onClose();
+        this.clear();
+    }
+
+    onChangeName(event)
+    {
+        this.setState 
+        ({
+            name : event.target.value
+
+        });
+    }
+
+    onChangeCount(event)
+    {
+        this.setState
+        ({
+            count : event.target.value
+        });
+    }
+
+    onChangeArticle(value)
+    {
+        
+        this.setState
+        ({
+            article : value,
+            name: '',
+            count : 0,
+            isNewOption : false
+        });
         if(value != null)
         {
             this.onNewOptionClick(value.className !=null);
         }
-        this.setState
-        ({
-            article : value
-        });
     }
 
     onNewOptionClick(isNew)
@@ -434,15 +774,26 @@ class AddPartModal extends React.Component
                     </Modal.Header>
                     <Modal.Body>
                         
-                            <label>Введите Артикул:</label>
-                            <Select.AsyncCreatable multi ={false} value ={this.state.article} autoload={false}  onChange = {this.onChange}  loadOptions ={this.getArticles} />
+                            <label>Артикул:</label>
+                            <Select.AsyncCreatable multi ={false} 
+                                                   value ={this.state.article} 
+                                                   autoload={false} 
+                                                   promptTextCreator={(label) => 'Добавить новую деталь c артикулом: ' + '"'+label+'"'} 
+                                                   onChange = {this.onChangeArticle}
+                                                   loadOptions ={this.getArticles} />
                             
-                            <label htmlFor="inputPartCount">Введите новое значение:</label>
-                            <input type="text" value ={this.state.isNewOption  ? 'Новая опция' : 'Старая опция'}  className="form-control" />
+                            {this.state.isNewOption ? <div>
+                                                        <label>Название:</label>
+                                                        <input type="text" className="form-control" value = {this.state.name} onChange={this.onChangeName}/>
+                                                      </div> : null}
+
+                            <label>Кол-во:</label>
+                            <input type="Number" className="form-control" value = {this.state.count} onChange={this.onChangeCount}/>
+                            
 
                     </Modal.Body>
                     <Modal.Footer>
-                        <button className="btn btn-primary"  onClick={this.onClose} >Подтвердить</button>
+                        <button className="btn btn-primary"  onClick={this.onConfirm} >Подтвердить</button>
                         <Button onClick={this.onClose}>Отмена</Button>
                     </Modal.Footer>
               </Modal>
@@ -573,146 +924,5 @@ ReactDOM.render(
 document.getElementById("root")
 );
 
-
-
-//class Parts extends React.Component {
-
-//    constructor(props)
-//    {
-//        super(props);
-//        this.state =
-//            {
-//                showModal: false,
-//                selectedPart : null
-//            }
-//        this.onSelectRowInTable = this.onSelectRowInTable.bind(this);
-//        this.open = this.open.bind(this);
-//        this.close = this.close.bind(this);
-//    }
-
-//    close()
-//    {
-//        this.setState({ showModal: false });
-//    }
-
-//    open() {
-//        this.setState({ showModal: true });
-//    }
-
-//    onSelectRowInTable(index)
-//    {
-//        var xxx = this.props.schemaParts.parts[index];
-//        console.log(xxx);
-//        this.setState({
-//            selectedPart: xxx
-//        });
-//    }
-
-//    render() {
-//        if(this.props.schemaParts == null)
-//        {
-//            return <NoPartsMessage/>
-//            }
-            
-
-//        return <div style={{ height: 300} }>
-     
-//    <div>
-//        <Button
-//        bsStyle="primary"
-//        onClick={this.open} >
-//        Изменить
-//        </Button>
-
-//    {this.props.selectedSchemeId != null && this.state.selectedPart != null ? <EditPartModalWindow show={this.state.showModal} onHide={this.close} selectedPart ={this.state.selectedPart }/> : null}
-//    <table className="table table-hover table-bordered" >
-//        <thead>
-//            <tr>
-//                <th>№</th>
-//                <th>Название</th>
-//                <th>Артикул</th>
-//                <th>Кол-во</th>
-//            </tr>
-//        </thead>
-//        <tbody>
-//    {this.props.schemaParts.parts.map((part, index) =>
-//                    <Part name={part.name} 
-//        count={part.count}  
-//        article = {part.article}
-//        detailId = {part.detailId}
-//        schemePartId = {part.schemePartId}
-//        key={index}
-//        onSelectRowInTable={this.onSelectRowInTable}
-//        index={index}/>)}
-//       </tbody>
-//   </table> 
-//   </div>
-
-//            </div>
-//       }
-//       }
-
-//value ={this.props.selectedPart!=null ? this.props.selectedPart.name : null}
-//value ={this.props.selectedPart!=null ? this.props.selectedPart.name : null}
-//class EditPartModalWindow extends React.Component
-//       {
-//    render()
-//       {
-//           return <Modal show={this.props.show} onHide={this.props.onHide}>
-//           <Modal.Header closeButton>
-//             <Modal.Title>Редактирование запчасти</Modal.Title>
-//           </Modal.Header>
-//           <Modal.Body>
-//               {this.props.selectedPart.name}
-//           {this.props.selectedPart.article}
-//           {this.props.selectedPart.count} 
-//           </Modal.Body>
-//           <Modal.Footer>
-//             <Button onClick={this.props.onHide}>Close</Button>
-//           </Modal.Footer>
-//         </Modal>
-//       }
-//}
-
-//<form>
-//  <div className="form-group">
-//    <label for="exampleInputEmail1">Название</label>
-//    <input type="text" className="form-control" id="formControlsPartName"  />
-//  </div>
-//  <div className="form-group">
-//    <label for="exampleInputPassword1">Артикуль</label>
-//    <input type="text" className="form-control" id="formControlsPartArticle"  />
-//  </div>
-  
-  
-//  <button type="submit" className="btn btn-default">Submit</button>
-//          </form>
-
-
-    
-
-/*class Part extends React.Component
-{
-    render()
-    {
-        return <tr onClick={this.props.onSelectRowInTable.bind(this,this.props.index)}>        
-                <td>{this.props.index + 1}</td>
-                <td>{this.props.name}</td>
-                <td>{this.props.article}</td>
-                <td>{this.props.count}</td>
-               </tr>
-    }
-}*/
-
-
-//const Part = (props) =>
-//    <tr onClick={props.onSel.bind}>        
-//                <td>{props.index + 1}</td>
-//                <td>{props.name}</td>
-//                <td>{props.article}</td>
-//        <td>{props.detailId}</td>
-//        <td>{props.schemePartId}</td>
-//                <td>{props.count}</td>
-//               </tr>
 
 

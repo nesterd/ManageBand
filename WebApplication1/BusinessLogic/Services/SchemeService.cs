@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Entities;
 
 namespace BusinessLogic.Services
 {
@@ -70,14 +71,45 @@ namespace BusinessLogic.Services
 
         public IEnumerable<SelectOptionDTO> GetArticles(string partOfArticle)
         {
-            //var detailList = _schemeRepo.GetDetails();
-            //var articleList = detailList.Select(detail => detail.Article);
-            //var filteredArticleList = articleList.Where(article => article.Contains(partOfArticle)).ToArray();
-            var detailList = _schemeRepo.GetDetails();
-            var filteredDetailList = detailList.Where(x => x.Article.Contains(partOfArticle)).Select(y => new SelectOptionDTO { value = y.Article, label = $"{y.Article} - {y.Name}" });
-            //var DTOList = filteredArticleList.Select(x => new SelectOptionDTO { value = x, label = x});
+            return _schemeRepo.GetDetails()
+                              .Where(x => x.Article.Contains(partOfArticle))
+                              .Select(y => new SelectOptionDTO { value = y.Article, label = $"Артикул: \"{y.Article}\" Название: \"{y.Name}\"" });
+        }
 
-            return filteredDetailList;
+        public void AddSchemePart(AddSchemePartDTO addSchemePart)
+        {
+            var article = addSchemePart.article;
+            if (!_schemeRepo.CheckDetail(article))
+            {
+                _schemeRepo.AddDetail(new Domain.Entities.Detail { Article = article, Name = addSchemePart.name });
+            }
+
+            _schemeRepo.AddSchemePart(new Domain.Entities.SchemePart
+            {
+                SchemeId = addSchemePart.schemeId,
+                PartId = _schemeRepo.GetDetailIdByArticle(article),
+                Count = addSchemePart.count
+            });
+        }
+
+        public void AddScheme(Scheme scheme)
+        {
+            _schemeRepo.AddScheme(scheme);
+        }
+
+        public SchemeDTO GetLastScheme()
+        {
+            return new SchemeDTO(_schemeRepo.GetLastScheme());
+        }
+
+        public void DeleteScheme(int id)
+        {
+            _schemeRepo.DeleteScheme(id);
+        }
+
+        public SchemeDTO GetSchemeById(int id)
+        {
+            return new SchemeDTO(_schemeRepo.GetSchemeById(id));
         }
     }
 }

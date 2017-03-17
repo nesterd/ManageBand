@@ -16,17 +16,18 @@ namespace BusinessLogic.DTO
         public int? parentId { get; set; }
         public IEnumerable<SchemeDTO> childs { get; set; }
 
-        public SchemeDTO(Scheme scheme)
+        public SchemeDTO(Scheme scheme, IEnumerable<SchemeDTO> childs)
         {
             id = scheme.Id;
             name = scheme.Name;
             image = scheme.Image;
             parentId = scheme.ParentId;
-            
-                if (scheme.Childs != null)
-                    childs = scheme.Childs.Select(child => new SchemeDTO(child)).ToList();
-                else
-                    childs = new List<SchemeDTO>();
+            this.childs = childs;
+
+                //if (scheme.Childs != null)
+                //    childs = scheme.Childs.Select(child => new SchemeDTO(child)).ToList();
+                //else
+                //    childs = new List<SchemeDTO>();
 
             isExpand = false;
         }

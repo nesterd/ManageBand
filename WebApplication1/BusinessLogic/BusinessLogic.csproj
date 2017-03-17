@@ -65,10 +65,6 @@
     <Compile Include="Services\SchemeService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
-      <Project>{22480bd7-db74-4701-9186-c8187ac08670}</Project>
-      <Name>DataAccess</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Domain\Domain.csproj">
       <Project>{017f438b-2c80-4b3e-b2b0-46a29795527e}</Project>
       <Name>Domain</Name>

@@ -1,7 +1,5 @@
 ﻿using BusinessLogic.DTO;
 using BusinessLogic.Services.Base;
-using DataAccess.Repositories;
-using DataAccess.Repositories.Base;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

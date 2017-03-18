@@ -68,11 +68,31 @@ namespace BusinessLogic.Services
 
         public IEnumerable<SchemePartsDTO> GetSchemePartList()
         {
-            //var schemePartList = _schemeRepo.GetSchemePartList();
             var schemePartList = _context.SchemeParts.ToArray();
             var schemeIdList = schemePartList.Select(x => x.SchemeId).Distinct().ToArray();
+            var details = _context.Details.ToArray();
 
-            return schemeIdList.Select(x => new SchemePartsDTO(x, schemePartList));
+            return schemeIdList
+                .Select(x => new SchemePartsDTO
+                                 (
+                                     x, 
+                                     schemePartList
+                                         .Where(schemePartPair => schemePartPair.SchemeId == x)
+                                         .Select(schemePartPair => 
+                                              new Part
+                                              {
+                                                  count = schemePartPair.Count,
+                                                  name = details
+                                                     .FirstOrDefault(detail => detail.Id == schemePartPair.PartId)
+                                                     .Name,
+                                                  article = details
+                                                     .FirstOrDefault(detail => detail.Id == schemePartPair.PartId)
+                                                     .Article,
+                                                  detailId = schemePartPair.PartId,
+                                                  schemePartId = schemePartPair.Id
+                                              })
+                                         .ToArray()
+                                 ));
 
         }
 

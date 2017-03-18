@@ -32,12 +32,31 @@ namespace BusinessLogic.Services
             return GetJSONString(GetSchemeList());
         }
 
+        IEnumerable<Scheme> GetDbSchemeList()
+        {
+            return _context.Schemes.ToArray();
+        }
+
+        SchemeDTO SchemeDTOConstructor(Scheme scheme, IEnumerable<Scheme> baseSchemeList)
+        {
+            return new DTO.SchemeDTO
+                (
+                scheme, 
+                baseSchemeList
+                .Where(item => item.ParentId == scheme.Id)
+                .Select(x => SchemeDTOConstructor(x, baseSchemeList))
+                );
+        }
+
         public IEnumerable<SchemeDTO> GetSchemeList()
         {
             //var list = _schemeRepo.GetSchemeList();
-
-            var list = _context.Schemes.ToArray();
-            var list2 = list.Where(x => x.ParentId == null).Select(item => new SchemeDTO(item));
+            var baseSchemeList = GetDbSchemeList();
+            var list2 = baseSchemeList
+                .Where(x => x.ParentId == null)
+                .Select(item => SchemeDTOConstructor(item, baseSchemeList));
+            //var list = _context.Schemes.ToArray();
+            //var list2 = list.Where(x => x.ParentId == null).Select(item => new SchemeDTO(item));
 
             return list2;
         }
@@ -137,7 +156,8 @@ namespace BusinessLogic.Services
 
         public SchemeDTO GetLastScheme()
         {
-            return new SchemeDTO(_context.Schemes.ToList().LastOrDefault());
+            var schemeList = GetDbSchemeList();
+            return SchemeDTOConstructor(schemeList.LastOrDefault(), schemeList);
         }
 
         public void DeleteScheme(int id)
@@ -168,9 +188,15 @@ namespace BusinessLogic.Services
             }
         }
 
+        Scheme GetDbSchemeById(int id)
+        {
+            return _context.Schemes.Find(id);
+        }
+
         public SchemeDTO GetSchemeById(int id)
         {
-            return new SchemeDTO(_context.Schemes.Find(id));
+
+            return SchemeDTOConstructor(GetDbSchemeById(id), GetDbSchemeList());
         }
     }
 }

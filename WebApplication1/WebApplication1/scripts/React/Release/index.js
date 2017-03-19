@@ -442,15 +442,43 @@ webpackJsonp([0,1],[
 	                        null,
 	                        '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435:'
 	                    ),
-	                    React.createElement('input', { type: 'text', className: 'form-control', value: this.state.name, onChange: this.onChangeName })
+	                    React.createElement(
+	                        'form',
+	                        { onSubmit: this.onClose },
+	                        React.createElement(
+	                            'div',
+	                            { className: 'form-group' },
+	                            React.createElement(
+	                                'label',
+	                                null,
+	                                '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435:'
+	                            ),
+	                            React.createElement('input', { type: 'text', className: 'form-control', value: this.state.name, onChange: this.onChangeName })
+	                        ),
+	                        React.createElement(
+	                            'div',
+	                            { className: 'form-group' },
+	                            React.createElement(
+	                                'label',
+	                                null,
+	                                '\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435:'
+	                            ),
+	                            React.createElement('input', { type: 'file', id: 'exampleInputFile' })
+	                        ),
+	                        React.createElement(
+	                            'button',
+	                            { type: 'submit', className: 'btn btn-default' },
+	                            'Submit'
+	                        )
+	                    )
 	                ),
 	                React.createElement(
 	                    Modal.Footer,
 	                    null,
 	                    React.createElement(
 	                        'button',
-	                        { className: 'btn btn-primary', onClick: this.onClose },
-	                        '\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C'
+	                        { type: 'submit', className: 'btn btn-default' },
+	                        'Submit'
 	                    ),
 	                    React.createElement(
 	                        Button,

@@ -373,11 +373,23 @@ class EditSchemeModal extends React.Component
                     </Modal.Header>
                     <Modal.Body>
                         <h4>Название:</h4>
-                        <input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
-                        
+                        <form onSubmit={this.onClose}>
+                            <div className="form-group">
+                                <label >Название:</label>
+                                <input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
+                            </div>
+                            <div className="form-group">
+                                <label >Изображение:</label>
+                                <input type="file" id="exampleInputFile"/>
+                            </div>
+                            <button type="submit" className="btn btn-default">Submit</button>
+                        </form>
+                        {/*<input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
+                        <input type="file" id="exampleInputFile"/>*/}
                     </Modal.Body>
                     <Modal.Footer>
-                        <button className="btn btn-primary"  onClick={this.onClose}>Подтвердить</button>
+                        {/*<button className="btn btn-primary"  onClick={this.onClose}>Подтвердить</button>*/}
+                        <button type="submit" className="btn btn-default">Submit</button>
                         <Button onClick={this.onClose}>Отмена</Button>
                     </Modal.Footer>
               </Modal>

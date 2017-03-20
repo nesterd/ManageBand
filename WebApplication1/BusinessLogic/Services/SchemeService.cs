@@ -50,13 +50,10 @@ namespace BusinessLogic.Services
 
         public IEnumerable<SchemeDTO> GetSchemeList()
         {
-            //var list = _schemeRepo.GetSchemeList();
             var baseSchemeList = GetDbSchemeList();
             var list2 = baseSchemeList
                 .Where(x => x.ParentId == null)
                 .Select(item => SchemeDTOConstructor(item, baseSchemeList));
-            //var list = _context.Schemes.ToArray();
-            //var list2 = list.Where(x => x.ParentId == null).Select(item => new SchemeDTO(item));
 
             return list2;
         }
@@ -98,12 +95,12 @@ namespace BusinessLogic.Services
 
         public SchemePartsDTO GetPartsBySchemeId(int schemeId)
         {
-            return GetSchemePartList().FirstOrDefault(x => x.schemeId == schemeId);
+            var schemeParts = GetSchemePartList().FirstOrDefault(x => x.schemeId == schemeId);
+            return schemeParts != null ? schemeParts : new SchemePartsDTO(schemeId, new List<Part>());
         }
 
         public void EditPartCount(int schemePartId, int newCount)
         {
-            //_schemeRepo.EditPartCount(schemePartId, newCount);
             var schemePart = _context.SchemeParts.Find(schemePartId);
             if (schemePart == null)
                 return;
@@ -115,7 +112,6 @@ namespace BusinessLogic.Services
 
         public void DeletePart(int schemePartId)
         {
-            //_schemeRepo.DeletePart(schemePartId);
             var schemePart = _context.SchemeParts.Find(schemePartId);
             if (schemePart == null)
                 return;
@@ -185,13 +181,6 @@ namespace BusinessLogic.Services
             var schemeTable = _context.Schemes;
             List<Scheme> listToRemove = new List<Scheme>();
             AddSchemesToListToRemove(id, listToRemove, schemeTable);
-            //var scheme = _context.Schemes.Find(id);
-            //if(scheme != null)
-            //{
-            //    _context.Schemes.Remove(scheme);
-            //    _context.SaveChanges();
-            //}
-
             schemeTable.RemoveRange(listToRemove);
             _context.SaveChanges();
         }
@@ -200,7 +189,8 @@ namespace BusinessLogic.Services
         {
             var schemeToRemove = tableInDb.Find(id);
             listToRemove.Add(schemeToRemove);
-            var childsToRemove = schemeToRemove.Childs;
+            //var childsToRemove = schemeToRemove.Childs;
+            var childsToRemove = tableInDb.Where(scheme => scheme.ParentId == id).ToList();
             if (childsToRemove.Count > 0)
             {
                 foreach (var child in childsToRemove)

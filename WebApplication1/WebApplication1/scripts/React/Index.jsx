@@ -7,7 +7,34 @@ var FieldGroup = require('react-bootstrap').FieldGroup;
 var Select = require('react-select');
 import 'react-select/dist/react-select.css';
 
+const ajaxRequest = (actionName, item, method, self) =>
+    {
+        // var self = this;
+        var path = '/Default/'+actionName;
 
+        fetch(path, { 
+            method  : 'post', 
+            body : JSON.stringify(item)
+        })
+        .then(function(response)
+        {
+            if(response.ok)
+            {
+                return response.json();
+            }
+            throw new Error('Network response was not ok.');
+            
+        })
+        .then(function(json){
+            {
+                self.close();
+                method(json);
+            }
+            
+        })
+        .catch(function(error) {
+         console.log('There has been a problem with your fetch operation: ' + error.message);});
+    }
 
 class PartsCatalogue extends React.Component
 {
@@ -29,12 +56,14 @@ class PartsCatalogue extends React.Component
 
     onEditPart(newSchemePartsList)
     {
-        // let list = this.state.schemaParts;
-        // let schemeParts = list.find(sp => sp.schemeId == this.state.selectedScheme.id);
-        // schemeParts.parts = newSchemePartsList.parts;
-        // let part = schemeParts.parts.find(prt => prt.schemePartId == schemePartId);
-        // part.count = newCount;
-        this.setState({schemaParts : newSchemePartsList});
+        let list = this.state.schemaParts.slice();
+        let schemeParts = list.find(sp => sp.schemeId == this.state.selectedScheme.id);
+        if(schemeParts == undefined)
+            list.push(newSchemePartsList);
+        else
+            schemeParts.parts = newSchemePartsList.parts;
+
+        this.setState({schemaParts : list});
     }
 
     onDeleteScheme(schemeToDelete)
@@ -147,46 +176,46 @@ class SchemeListBlock extends React.Component
         this.onAddSchemeButtonClick = this.onAddSchemeButtonClick.bind(this);
         this.onEditSchemeButtonClick = this.onEditSchemeButtonClick.bind(this);
         this.onDeleteSchemeButtonClick = this.onDeleteSchemeButtonClick.bind(this);
-        this.ajaxSchemeRequest = this.ajaxSchemeRequest.bind(this);
+        // this.ajaxSchemeRequest = this.ajaxSchemeRequest.bind(this);
     }
 
-    ajaxSchemeRequest(actionName, item, method)
-    {
-        var self = this;
-        var path = '/Default/'+actionName;
+    // ajaxSchemeRequest(actionName, item, method)
+    // {
+    //     var self = this;
+    //     var path = '/Default/'+actionName;
 
-        fetch(path, { 
-            method  : 'post', 
-            body : JSON.stringify(item)
-        })
-        .then(function(response)
-        {
-            if(response.ok)
-            {
-                return response.json();
-            }
-            throw new Error('Network response was not ok.');
+    //     fetch(path, { 
+    //         method  : 'post', 
+    //         body : JSON.stringify(item)
+    //     })
+    //     .then(function(response)
+    //     {
+    //         if(response.ok)
+    //         {
+    //             return response.json();
+    //         }
+    //         throw new Error('Network response was not ok.');
             
-        })
-        .then(function(json){
-            {
-                self.close();
-                method(json);
-            }
+    //     })
+    //     .then(function(json){
+    //         {
+    //             self.close();
+    //             method(json);
+    //         }
             
-        })
-        .catch(function(error) {
-         console.log('There has been a problem with your fetch operation: ' + error.message);});
-    }
+    //     })
+    //     .catch(function(error) {
+    //      console.log('There has been a problem with your fetch operation: ' + error.message);});
+    // }
 
     onConfirmAddScheme(name, parentSchemeId)
     {
-        this.ajaxSchemeRequest('AddScheme', {name : name, parentId : parentSchemeId}, this.props.onEditScheme);
+        ajaxRequest('AddScheme', {name : name, parentId : parentSchemeId}, this.props.onEditScheme, this);
     }
 
     onConfirmDeleteScheme(id)
     {
-        this.ajaxSchemeRequest('DeleteScheme', id, this.props.onDeleteScheme);
+        ajaxRequest('DeleteScheme', id, this.props.onDeleteScheme, this);
     }
 
     onAddRootSchemeButtonClick()
@@ -545,7 +574,7 @@ class PartListBlock extends React.Component
         this.onEditPartButtonClick = this.onEditPartButtonClick.bind(this);
         this.onDeletePartButtonClick = this.onDeletePartButtonClick.bind(this);
         this.onAddPartButtonClick = this.onAddPartButtonClick.bind(this);
-        this.ajaxRequest = this.ajaxRequest.bind(this);
+        // this.ajaxRequest = this.ajaxRequest.bind(this);
         this.close = this.close.bind(this);
         this.onConfirmEdit = this.onConfirmEdit.bind(this);
         this.onConfirmDelete = this.onConfirmDelete.bind(this);
@@ -593,49 +622,49 @@ class PartListBlock extends React.Component
             });
     }
 
-    ajaxRequest(actionName, item)
-    {
-        var self = this;
-        var path = '/Default/'+actionName;
+    // ajaxRequest(actionName, item)
+    // {
+    //     var self = this;
+    //     var path = '/Default/'+actionName;
 
-        fetch(path, { 
-            method  : 'post', 
-            body : JSON.stringify(item)
-        })
-        .then(function(response)
-        {
-            if(response.ok)
-            {
-                return response.json();
-            }
-            throw new Error('Network response was not ok.');
+    //     fetch(path, { 
+    //         method  : 'post', 
+    //         body : JSON.stringify(item)
+    //     })
+    //     .then(function(response)
+    //     {
+    //         if(response.ok)
+    //         {
+    //             return response.json();
+    //         }
+    //         throw new Error('Network response was not ok.');
             
-        })
-        .then(function(json){
-            {
-                self.close();
-                self.props.onEditPart(json);
-            }
+    //     })
+    //     .then(function(json){
+    //         {
+    //             self.close();
+    //             self.props.onEditPart(json);
+    //         }
             
-        })
-        .catch(function(error) {
-         console.log('There has been a problem with your fetch operation: ' + error.message);});
-    }
+    //     })
+    //     .catch(function(error) {
+    //      console.log('There has been a problem with your fetch operation: ' + error.message);});
+    // }
 
     onConfirmAddSchemePart(article, name, count)
     {
-        this.ajaxRequest('AddSchemePart', {article : article, name : name, count : count, schemeId : this.props.selectedSchemeId});
+        ajaxRequest('AddSchemePart', {article : article, name : name, count : count, schemeId : this.props.selectedSchemeId}, this.props.onEditPart, this);
 
     }
 
     onConfirmDelete(schemePartId)
     {
-        this.ajaxRequest('DeletePart',{schemePartId : schemePartId, newCount : 0, schemeId : this.props.selectedSchemeId});
+        ajaxRequest('DeletePart',{schemePartId : schemePartId, newCount : 0, schemeId : this.props.selectedSchemeId}, this.props.onEditPart, this);
     }
 
     onConfirmEdit(schemePartId, count)
     {
-        this.ajaxRequest('EditPart', {schemePartId : schemePartId, newCount : count, schemeId : this.props.selectedSchemeId});
+        ajaxRequest('EditPart', {schemePartId : schemePartId, newCount : count, schemeId : this.props.selectedSchemeId}, this.props.onEditPart, this);
     }
 
     render()
@@ -660,7 +689,7 @@ class PartListBlock extends React.Component
                                                                            onClose = {this.close}
                                                                            part = {this.state.editedSchemePart}/> : null}
 
-                   {this.props.schemeParts == null ? <NoPartsMessage/> : <PartsTable isAdmin={this.state.isAdmin}
+                   {(this.props.schemeParts == null || this.props.schemeParts.parts.length == 0) ? <NoPartsMessage/> : <PartsTable isAdmin={this.state.isAdmin}
                                                                                      schemeParts = {this.props.schemeParts}
                                                                                      onEditPartButtonClick ={this.onEditPartButtonClick}
                                                                                      onDeletePartButtonClick ={this.onDeletePartButtonClick} />}
@@ -692,6 +721,7 @@ class AddPartModal extends React.Component
 
     getArticles(input)
     {
+        // return ajaxRequest('GetArticles', input, (json) => { return { options: json }});
         return fetch('/Default/GetArticles', { 
             method  : 'post', 
             body : JSON.stringify(input)

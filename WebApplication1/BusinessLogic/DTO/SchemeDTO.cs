@@ -23,12 +23,6 @@ namespace BusinessLogic.DTO
             image = scheme.Image;
             parentId = scheme.ParentId;
             this.childs = childs;
-
-                //if (scheme.Childs != null)
-                //    childs = scheme.Childs.Select(child => new SchemeDTO(child)).ToList();
-                //else
-                //    childs = new List<SchemeDTO>();
-
             isExpand = false;
         }
     }

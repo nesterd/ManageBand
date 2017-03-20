@@ -17,6 +17,5 @@ namespace BusinessLogic.DTO
             this.schemeId = schemeId;
             this.parts = parts;
         }
-
     }
 }

@@ -39,7 +39,7 @@ namespace WebApplication1.Controllers
 
             _schemeService.AddSchemePart(model);
 
-            return Json(_schemeService.GetSchemePartList());
+            return Json(_schemeService.GetPartsBySchemeId(model.schemeId));
         }
 
         [HttpPost]
@@ -49,8 +49,8 @@ namespace WebApplication1.Controllers
             var model = JsonConvert.DeserializeObject<EditPartCountModel>(jsonString);
             _schemeService.EditPartCount(model.schemePartId, model.newCount);
 
-            //return Json(_schemeService.GetPartsBySchemeId(model.schemeId));
-            return Json(_schemeService.GetSchemePartList());
+            return Json(_schemeService.GetPartsBySchemeId(model.schemeId));
+            //return Json(_schemeService.GetSchemePartList());
         }
 
         [HttpPost]
@@ -59,8 +59,9 @@ namespace WebApplication1.Controllers
             var jsonString = new StreamReader(Request.InputStream).ReadToEnd();
             var model = JsonConvert.DeserializeObject<EditPartCountModel>(jsonString);
             _schemeService.DeletePart(model.schemePartId);
-            //return Json(_schemeService.GetPartsBySchemeId(model.schemeId));
-            return Json(_schemeService.GetSchemePartList());
+
+            //return Json(_schemeService.GetSchemePartList());
+            return Json(_schemeService.GetPartsBySchemeId(model.schemeId));
         }
 
         [HttpPost]

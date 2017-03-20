@@ -24,6 +24,29 @@ webpackJsonp([0,1],[
 	var FieldGroup = __webpack_require__(/*! react-bootstrap */ 182).FieldGroup;
 	var Select = __webpack_require__(/*! react-select */ 435);
 	
+	
+	var ajaxRequest = function ajaxRequest(actionName, item, method, self) {
+	    // var self = this;
+	    var path = '/Default/' + actionName;
+	
+	    fetch(path, {
+	        method: 'post',
+	        body: JSON.stringify(item)
+	    }).then(function (response) {
+	        if (response.ok) {
+	            return response.json();
+	        }
+	        throw new Error('Network response was not ok.');
+	    }).then(function (json) {
+	        {
+	            self.close();
+	            method(json);
+	        }
+	    }).catch(function (error) {
+	        console.log('There has been a problem with your fetch operation: ' + error.message);
+	    });
+	};
+	
 	var PartsCatalogue = function (_React$Component) {
 	    _inherits(PartsCatalogue, _React$Component);
 	
@@ -48,12 +71,15 @@ webpackJsonp([0,1],[
 	    _createClass(PartsCatalogue, [{
 	        key: 'onEditPart',
 	        value: function onEditPart(newSchemePartsList) {
-	            // let list = this.state.schemaParts;
-	            // let schemeParts = list.find(sp => sp.schemeId == this.state.selectedScheme.id);
-	            // schemeParts.parts = newSchemePartsList.parts;
-	            // let part = schemeParts.parts.find(prt => prt.schemePartId == schemePartId);
-	            // part.count = newCount;
-	            this.setState({ schemaParts: newSchemePartsList });
+	            var _this2 = this;
+	
+	            var list = this.state.schemaParts.slice();
+	            var schemeParts = list.find(function (sp) {
+	                return sp.schemeId == _this2.state.selectedScheme.id;
+	            });
+	            if (schemeParts == undefined) list.push(newSchemePartsList);else schemeParts.parts = newSchemePartsList.parts;
+	
+	            this.setState({ schemaParts: list });
 	        }
 	    }, {
 	        key: 'onDeleteScheme',
@@ -125,7 +151,7 @@ webpackJsonp([0,1],[
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var _this3 = this;
 	
 	            return React.createElement(
 	                'div',
@@ -143,7 +169,7 @@ webpackJsonp([0,1],[
 	                    selectedSchemeId: this.state.selectedScheme.id,
 	                    selectedSchemeName: this.state.selectedScheme.name,
 	                    schemeParts: this.state.schemaParts.find(function (pts) {
-	                        return pts.schemeId == _this2.state.selectedScheme.id;
+	                        return pts.schemeId == _this3.state.selectedScheme.id;
 	                    })
 	                }) : null
 	            );
@@ -159,59 +185,65 @@ webpackJsonp([0,1],[
 	    function SchemeListBlock(props) {
 	        _classCallCheck(this, SchemeListBlock);
 	
-	        var _this3 = _possibleConstructorReturn(this, (SchemeListBlock.__proto__ || Object.getPrototypeOf(SchemeListBlock)).call(this, props));
+	        var _this4 = _possibleConstructorReturn(this, (SchemeListBlock.__proto__ || Object.getPrototypeOf(SchemeListBlock)).call(this, props));
 	
-	        _this3.state = {
-	            isAdmin: _this3.props.isAdmin,
+	        _this4.state = {
+	            isAdmin: _this4.props.isAdmin,
 	            isRootScheme: false,
 	            AddSchemeModalShow: false,
 	            EditSchemeModalShow: false,
 	            DeleteSchemeModalShow: false
 	
 	        };
-	        _this3.close = _this3.close.bind(_this3);
-	        _this3.onConfirmAddScheme = _this3.onConfirmAddScheme.bind(_this3);
-	        _this3.onConfirmDeleteScheme = _this3.onConfirmDeleteScheme.bind(_this3);
-	        _this3.onAddRootSchemeButtonClick = _this3.onAddRootSchemeButtonClick.bind(_this3);
-	        _this3.onAddSchemeButtonClick = _this3.onAddSchemeButtonClick.bind(_this3);
-	        _this3.onEditSchemeButtonClick = _this3.onEditSchemeButtonClick.bind(_this3);
-	        _this3.onDeleteSchemeButtonClick = _this3.onDeleteSchemeButtonClick.bind(_this3);
-	        _this3.ajaxSchemeRequest = _this3.ajaxSchemeRequest.bind(_this3);
-	        return _this3;
+	        _this4.close = _this4.close.bind(_this4);
+	        _this4.onConfirmAddScheme = _this4.onConfirmAddScheme.bind(_this4);
+	        _this4.onConfirmDeleteScheme = _this4.onConfirmDeleteScheme.bind(_this4);
+	        _this4.onAddRootSchemeButtonClick = _this4.onAddRootSchemeButtonClick.bind(_this4);
+	        _this4.onAddSchemeButtonClick = _this4.onAddSchemeButtonClick.bind(_this4);
+	        _this4.onEditSchemeButtonClick = _this4.onEditSchemeButtonClick.bind(_this4);
+	        _this4.onDeleteSchemeButtonClick = _this4.onDeleteSchemeButtonClick.bind(_this4);
+	        // this.ajaxSchemeRequest = this.ajaxSchemeRequest.bind(this);
+	        return _this4;
 	    }
 	
-	    _createClass(SchemeListBlock, [{
-	        key: 'ajaxSchemeRequest',
-	        value: function ajaxSchemeRequest(actionName, item, method) {
-	            var self = this;
-	            var path = '/Default/' + actionName;
+	    // ajaxSchemeRequest(actionName, item, method)
+	    // {
+	    //     var self = this;
+	    //     var path = '/Default/'+actionName;
 	
-	            fetch(path, {
-	                method: 'post',
-	                body: JSON.stringify(item)
-	            }).then(function (response) {
-	                if (response.ok) {
-	                    return response.json();
-	                }
-	                throw new Error('Network response was not ok.');
-	            }).then(function (json) {
-	                {
-	                    self.close();
-	                    method(json);
-	                }
-	            }).catch(function (error) {
-	                console.log('There has been a problem with your fetch operation: ' + error.message);
-	            });
-	        }
-	    }, {
+	    //     fetch(path, { 
+	    //         method  : 'post', 
+	    //         body : JSON.stringify(item)
+	    //     })
+	    //     .then(function(response)
+	    //     {
+	    //         if(response.ok)
+	    //         {
+	    //             return response.json();
+	    //         }
+	    //         throw new Error('Network response was not ok.');
+	
+	    //     })
+	    //     .then(function(json){
+	    //         {
+	    //             self.close();
+	    //             method(json);
+	    //         }
+	
+	    //     })
+	    //     .catch(function(error) {
+	    //      console.log('There has been a problem with your fetch operation: ' + error.message);});
+	    // }
+	
+	    _createClass(SchemeListBlock, [{
 	        key: 'onConfirmAddScheme',
 	        value: function onConfirmAddScheme(name, parentSchemeId) {
-	            this.ajaxSchemeRequest('AddScheme', { name: name, parentId: parentSchemeId }, this.props.onEditScheme);
+	            ajaxRequest('AddScheme', { name: name, parentId: parentSchemeId }, this.props.onEditScheme, this);
 	        }
 	    }, {
 	        key: 'onConfirmDeleteScheme',
 	        value: function onConfirmDeleteScheme(id) {
-	            this.ajaxSchemeRequest('DeleteScheme', id, this.props.onDeleteScheme);
+	            ajaxRequest('DeleteScheme', id, this.props.onDeleteScheme, this);
 	        }
 	    }, {
 	        key: 'onAddRootSchemeButtonClick',
@@ -300,15 +332,15 @@ webpackJsonp([0,1],[
 	    function AddSchemeModal(props) {
 	        _classCallCheck(this, AddSchemeModal);
 	
-	        var _this4 = _possibleConstructorReturn(this, (AddSchemeModal.__proto__ || Object.getPrototypeOf(AddSchemeModal)).call(this, props));
+	        var _this5 = _possibleConstructorReturn(this, (AddSchemeModal.__proto__ || Object.getPrototypeOf(AddSchemeModal)).call(this, props));
 	
-	        _this4.state = {
+	        _this5.state = {
 	            name: ''
 	        };
-	        _this4.onChangeName = _this4.onChangeName.bind(_this4);
-	        _this4.onClose = _this4.onClose.bind(_this4);
-	        _this4.onConfirm = _this4.onConfirm.bind(_this4);
-	        return _this4;
+	        _this5.onChangeName = _this5.onChangeName.bind(_this5);
+	        _this5.onClose = _this5.onClose.bind(_this5);
+	        _this5.onConfirm = _this5.onConfirm.bind(_this5);
+	        return _this5;
 	    }
 	
 	    _createClass(AddSchemeModal, [{
@@ -393,14 +425,14 @@ webpackJsonp([0,1],[
 	    function EditSchemeModal(props) {
 	        _classCallCheck(this, EditSchemeModal);
 	
-	        var _this5 = _possibleConstructorReturn(this, (EditSchemeModal.__proto__ || Object.getPrototypeOf(EditSchemeModal)).call(this, props));
+	        var _this6 = _possibleConstructorReturn(this, (EditSchemeModal.__proto__ || Object.getPrototypeOf(EditSchemeModal)).call(this, props));
 	
-	        _this5.state = {
-	            name: _this5.props.name
+	        _this6.state = {
+	            name: _this6.props.name
 	        };
-	        _this5.onChangeName = _this5.onChangeName.bind(_this5);
-	        _this5.onClose = _this5.onClose.bind(_this5);
-	        return _this5;
+	        _this6.onChangeName = _this6.onChangeName.bind(_this6);
+	        _this6.onClose = _this6.onClose.bind(_this6);
+	        return _this6;
 	    }
 	
 	    _createClass(EditSchemeModal, [{
@@ -563,7 +595,7 @@ webpackJsonp([0,1],[
 	    _createClass(SchemeList, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this7 = this;
+	            var _this8 = this;
 	
 	            return React.createElement(
 	                'ul',
@@ -571,16 +603,16 @@ webpackJsonp([0,1],[
 	                this.props.schemeList.map(function (scheme) {
 	                    return React.createElement(Scheme, { name: scheme.name,
 	                        key: scheme.id,
-	                        isAdmin: _this7.props.isAdmin,
+	                        isAdmin: _this8.props.isAdmin,
 	                        index: scheme.id,
 	                        childs: scheme.childs,
 	                        isExpand: scheme.isExpand,
-	                        onExpand: _this7.props.onExpand,
-	                        onSelect: _this7.props.onSelect,
-	                        onAddSchemeButtonClick: _this7.props.onAddSchemeButtonClick,
-	                        onEditSchemeButtonClick: _this7.props.onEditSchemeButtonClick,
-	                        onDeleteSchemeButtonClick: _this7.props.onDeleteSchemeButtonClick,
-	                        selectedSchemeId: _this7.props.selectedSchemeId });
+	                        onExpand: _this8.props.onExpand,
+	                        onSelect: _this8.props.onSelect,
+	                        onAddSchemeButtonClick: _this8.props.onAddSchemeButtonClick,
+	                        onEditSchemeButtonClick: _this8.props.onEditSchemeButtonClick,
+	                        onDeleteSchemeButtonClick: _this8.props.onDeleteSchemeButtonClick,
+	                        selectedSchemeId: _this8.props.selectedSchemeId });
 	                })
 	            );
 	        }
@@ -762,24 +794,24 @@ webpackJsonp([0,1],[
 	    function PartListBlock(props) {
 	        _classCallCheck(this, PartListBlock);
 	
-	        var _this11 = _possibleConstructorReturn(this, (PartListBlock.__proto__ || Object.getPrototypeOf(PartListBlock)).call(this, props));
+	        var _this12 = _possibleConstructorReturn(this, (PartListBlock.__proto__ || Object.getPrototypeOf(PartListBlock)).call(this, props));
 	
-	        _this11.state = {
+	        _this12.state = {
 	
-	            isAdmin: _this11.props.isAdmin,
+	            isAdmin: _this12.props.isAdmin,
 	            showAddModal: false,
 	            showEditModal: false,
 	            showDeleteModal: false
 	        };
-	        _this11.onEditPartButtonClick = _this11.onEditPartButtonClick.bind(_this11);
-	        _this11.onDeletePartButtonClick = _this11.onDeletePartButtonClick.bind(_this11);
-	        _this11.onAddPartButtonClick = _this11.onAddPartButtonClick.bind(_this11);
-	        _this11.ajaxRequest = _this11.ajaxRequest.bind(_this11);
-	        _this11.close = _this11.close.bind(_this11);
-	        _this11.onConfirmEdit = _this11.onConfirmEdit.bind(_this11);
-	        _this11.onConfirmDelete = _this11.onConfirmDelete.bind(_this11);
-	        _this11.onConfirmAddSchemePart = _this11.onConfirmAddSchemePart.bind(_this11);
-	        return _this11;
+	        _this12.onEditPartButtonClick = _this12.onEditPartButtonClick.bind(_this12);
+	        _this12.onDeletePartButtonClick = _this12.onDeletePartButtonClick.bind(_this12);
+	        _this12.onAddPartButtonClick = _this12.onAddPartButtonClick.bind(_this12);
+	        // this.ajaxRequest = this.ajaxRequest.bind(this);
+	        _this12.close = _this12.close.bind(_this12);
+	        _this12.onConfirmEdit = _this12.onConfirmEdit.bind(_this12);
+	        _this12.onConfirmDelete = _this12.onConfirmDelete.bind(_this12);
+	        _this12.onConfirmAddSchemePart = _this12.onConfirmAddSchemePart.bind(_this12);
+	        return _this12;
 	    }
 	
 	    _createClass(PartListBlock, [{
@@ -823,43 +855,50 @@ webpackJsonp([0,1],[
 	                editedSchemePart: part
 	            });
 	        }
-	    }, {
-	        key: 'ajaxRequest',
-	        value: function ajaxRequest(actionName, item) {
-	            var self = this;
-	            var path = '/Default/' + actionName;
 	
-	            fetch(path, {
-	                method: 'post',
-	                body: JSON.stringify(item)
-	            }).then(function (response) {
-	                if (response.ok) {
-	                    return response.json();
-	                }
-	                throw new Error('Network response was not ok.');
-	            }).then(function (json) {
-	                {
-	                    self.close();
-	                    self.props.onEditPart(json);
-	                }
-	            }).catch(function (error) {
-	                console.log('There has been a problem with your fetch operation: ' + error.message);
-	            });
-	        }
+	        // ajaxRequest(actionName, item)
+	        // {
+	        //     var self = this;
+	        //     var path = '/Default/'+actionName;
+	
+	        //     fetch(path, { 
+	        //         method  : 'post', 
+	        //         body : JSON.stringify(item)
+	        //     })
+	        //     .then(function(response)
+	        //     {
+	        //         if(response.ok)
+	        //         {
+	        //             return response.json();
+	        //         }
+	        //         throw new Error('Network response was not ok.');
+	
+	        //     })
+	        //     .then(function(json){
+	        //         {
+	        //             self.close();
+	        //             self.props.onEditPart(json);
+	        //         }
+	
+	        //     })
+	        //     .catch(function(error) {
+	        //      console.log('There has been a problem with your fetch operation: ' + error.message);});
+	        // }
+	
 	    }, {
 	        key: 'onConfirmAddSchemePart',
 	        value: function onConfirmAddSchemePart(article, name, count) {
-	            this.ajaxRequest('AddSchemePart', { article: article, name: name, count: count, schemeId: this.props.selectedSchemeId });
+	            ajaxRequest('AddSchemePart', { article: article, name: name, count: count, schemeId: this.props.selectedSchemeId }, this.props.onEditPart, this);
 	        }
 	    }, {
 	        key: 'onConfirmDelete',
 	        value: function onConfirmDelete(schemePartId) {
-	            this.ajaxRequest('DeletePart', { schemePartId: schemePartId, newCount: 0, schemeId: this.props.selectedSchemeId });
+	            ajaxRequest('DeletePart', { schemePartId: schemePartId, newCount: 0, schemeId: this.props.selectedSchemeId }, this.props.onEditPart, this);
 	        }
 	    }, {
 	        key: 'onConfirmEdit',
 	        value: function onConfirmEdit(schemePartId, count) {
-	            this.ajaxRequest('EditPart', { schemePartId: schemePartId, newCount: count, schemeId: this.props.selectedSchemeId });
+	            ajaxRequest('EditPart', { schemePartId: schemePartId, newCount: count, schemeId: this.props.selectedSchemeId }, this.props.onEditPart, this);
 	        }
 	    }, {
 	        key: 'render',
@@ -884,7 +923,7 @@ webpackJsonp([0,1],[
 	                    show: this.state.showDeleteModal,
 	                    onClose: this.close,
 	                    part: this.state.editedSchemePart }) : null,
-	                this.props.schemeParts == null ? React.createElement(NoPartsMessage, null) : React.createElement(PartsTable, { isAdmin: this.state.isAdmin,
+	                this.props.schemeParts == null || this.props.schemeParts.parts.length == 0 ? React.createElement(NoPartsMessage, null) : React.createElement(PartsTable, { isAdmin: this.state.isAdmin,
 	                    schemeParts: this.props.schemeParts,
 	                    onEditPartButtonClick: this.onEditPartButtonClick,
 	                    onDeletePartButtonClick: this.onDeletePartButtonClick })
@@ -901,28 +940,29 @@ webpackJsonp([0,1],[
 	    function AddPartModal(props) {
 	        _classCallCheck(this, AddPartModal);
 	
-	        var _this12 = _possibleConstructorReturn(this, (AddPartModal.__proto__ || Object.getPrototypeOf(AddPartModal)).call(this, props));
+	        var _this13 = _possibleConstructorReturn(this, (AddPartModal.__proto__ || Object.getPrototypeOf(AddPartModal)).call(this, props));
 	
-	        _this12.state = {
+	        _this13.state = {
 	            isNewOption: false,
 	            article: '',
 	            name: '',
 	            count: 0
 	        };
-	        _this12.onChangeArticle = _this12.onChangeArticle.bind(_this12);
-	        _this12.clear = _this12.clear.bind(_this12);
-	        _this12.onConfirm = _this12.onConfirm.bind(_this12);
-	        _this12.onChangeName = _this12.onChangeName.bind(_this12);
-	        _this12.onChangeCount = _this12.onChangeCount.bind(_this12);
-	        _this12.getArticles = _this12.getArticles.bind(_this12);
-	        _this12.onClose = _this12.onClose.bind(_this12);
-	        _this12.onNewOptionClick = _this12.onNewOptionClick.bind(_this12);
-	        return _this12;
+	        _this13.onChangeArticle = _this13.onChangeArticle.bind(_this13);
+	        _this13.clear = _this13.clear.bind(_this13);
+	        _this13.onConfirm = _this13.onConfirm.bind(_this13);
+	        _this13.onChangeName = _this13.onChangeName.bind(_this13);
+	        _this13.onChangeCount = _this13.onChangeCount.bind(_this13);
+	        _this13.getArticles = _this13.getArticles.bind(_this13);
+	        _this13.onClose = _this13.onClose.bind(_this13);
+	        _this13.onNewOptionClick = _this13.onNewOptionClick.bind(_this13);
+	        return _this13;
 	    }
 	
 	    _createClass(AddPartModal, [{
 	        key: 'getArticles',
 	        value: function getArticles(input) {
+	            // return ajaxRequest('GetArticles', input, (json) => { return { options: json }});
 	            return fetch('/Default/GetArticles', {
 	                method: 'post',
 	                body: JSON.stringify(input)
@@ -1073,13 +1113,13 @@ webpackJsonp([0,1],[
 	    function EditPartModal(props) {
 	        _classCallCheck(this, EditPartModal);
 	
-	        var _this13 = _possibleConstructorReturn(this, (EditPartModal.__proto__ || Object.getPrototypeOf(EditPartModal)).call(this, props));
+	        var _this14 = _possibleConstructorReturn(this, (EditPartModal.__proto__ || Object.getPrototypeOf(EditPartModal)).call(this, props));
 	
-	        _this13.state = {
-	            count: _this13.props.part.count
+	        _this14.state = {
+	            count: _this14.props.part.count
 	        };
-	        _this13.onChange = _this13.onChange.bind(_this13);
-	        return _this13;
+	        _this14.onChange = _this14.onChange.bind(_this14);
+	        return _this14;
 	    }
 	
 	    _createClass(EditPartModal, [{

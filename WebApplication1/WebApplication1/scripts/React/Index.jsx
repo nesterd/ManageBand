@@ -5,11 +5,13 @@ var Modal = require('react-bootstrap').Modal;
 var Button = require('react-bootstrap').Button;
 var FieldGroup = require('react-bootstrap').FieldGroup;
 var Select = require('react-select');
+var FileInput = require('react-file-input');
 import 'react-select/dist/react-select.css';
+
+
 
 const ajaxRequest = (actionName, item, method, self) =>
     {
-        // var self = this;
         var path = '/Default/'+actionName;
 
         fetch(path, { 
@@ -50,8 +52,9 @@ class PartsCatalogue extends React.Component
         this.handleOnExpand = this.handleOnExpand.bind(this);
         this.handleOnSelect = this.handleOnSelect.bind(this);
         this.onEditPart = this.onEditPart.bind(this);
-        this.onEditScheme = this.onEditScheme.bind(this);
+        this.onAddScheme = this.onAddScheme.bind(this);
         this.onDeleteScheme = this.onDeleteScheme.bind(this);
+        this.onEditScheme = this.onEditScheme.bind(this);
     }
 
     onEditPart(newSchemePartsList)
@@ -64,6 +67,16 @@ class PartsCatalogue extends React.Component
             schemeParts.parts = newSchemePartsList.parts;
 
         this.setState({schemaParts : list});
+    }
+
+    onEditScheme(editedScheme)
+    {
+        let list = this.state.schemeList.slice();
+        let oldScheme = this.findElement(editedScheme.id, list);
+        oldScheme.name = editedScheme.name;
+        oldScheme.image = editedScheme.image;
+
+        this.setState({ schemeList: list });
     }
 
     onDeleteScheme(schemeToDelete)
@@ -85,7 +98,7 @@ class PartsCatalogue extends React.Component
         this.setState({ schemeList: list });
     }
 
-    onEditScheme(newScheme)
+    onAddScheme(newScheme)
     {
         let list = this.state.schemeList.slice();
         if(newScheme.parentId == null)
@@ -100,7 +113,6 @@ class PartsCatalogue extends React.Component
 
         }
         this.setState({ schemeList: list });
-        // this.setState({schemeList : newSchemeList});
     }
 
     findElement(id, someList) {
@@ -138,6 +150,7 @@ class PartsCatalogue extends React.Component
                                     isAdmin ={this.state.isAdmin} 
                                     onExpand={this.handleOnExpand} 
                                     onSelect={this.handleOnSelect}
+                                    onAddScheme = {this.onAddScheme}
                                     onEditScheme = {this.onEditScheme}
                                     onDeleteScheme = {this.onDeleteScheme} 
                                     selectedSchemeId={this.state.selectedScheme != undefined ? this.state.selectedScheme.id : null }/>
@@ -176,46 +189,80 @@ class SchemeListBlock extends React.Component
         this.onAddSchemeButtonClick = this.onAddSchemeButtonClick.bind(this);
         this.onEditSchemeButtonClick = this.onEditSchemeButtonClick.bind(this);
         this.onDeleteSchemeButtonClick = this.onDeleteSchemeButtonClick.bind(this);
-        // this.ajaxSchemeRequest = this.ajaxSchemeRequest.bind(this);
+        this.onConfirmEditScheme = this.onConfirmEditScheme.bind(this);
     }
 
-    // ajaxSchemeRequest(actionName, item, method)
-    // {
-    //     var self = this;
-    //     var path = '/Default/'+actionName;
-
-    //     fetch(path, { 
-    //         method  : 'post', 
-    //         body : JSON.stringify(item)
-    //     })
-    //     .then(function(response)
-    //     {
-    //         if(response.ok)
-    //         {
-    //             return response.json();
-    //         }
-    //         throw new Error('Network response was not ok.');
-            
-    //     })
-    //     .then(function(json){
-    //         {
-    //             self.close();
-    //             method(json);
-    //         }
-            
-    //     })
-    //     .catch(function(error) {
-    //      console.log('There has been a problem with your fetch operation: ' + error.message);});
-    // }
-
-    onConfirmAddScheme(name, parentSchemeId)
+    onConfirmEditScheme(name, imageFile)
     {
-        ajaxRequest('AddScheme', {name : name, parentId : parentSchemeId}, this.props.onEditScheme, this);
+        // ajaxRequest('EditScheme', {name : name, id : this.state.Scheme.id, file : imageFile}, this.props.onEditScheme, this);
+        var self = this;
+        var path = '/Default/EditScheme';
+        var data = new FormData();
+        data.append('name', name);
+        data.append('id', this.state.Scheme.id);
+        data.append('image', imageFile);
+
+        fetch(path, { 
+            method  : 'post', 
+            body : data
+        })
+        .then(function(response)
+        {
+            if(response.ok)
+            {
+                return response.json();
+            }
+            throw new Error('Network response was not ok.');
+            
+        })
+        .then(function(json){
+            {
+                self.close();
+                self.props.onEditScheme(json);
+            }
+            
+        })
+        .catch(function(error) {
+         console.log('There has been a problem with your fetch operation: ' + error.message);});
     }
 
-    onConfirmDeleteScheme(id)
+    onConfirmAddScheme(name, imageFile, parentSchemeId)
     {
-        ajaxRequest('DeleteScheme', id, this.props.onDeleteScheme, this);
+        // ajaxRequest('AddScheme', {name : name, parentId : parentSchemeId}, this.props.onAddScheme, this);
+        var self = this;
+        var path = '/Default/AddScheme';
+        var data = new FormData();
+        data.append('name', name);
+        data.append('parentSchemeId', parentSchemeId);
+        data.append('image', imageFile);
+
+        fetch(path, { 
+            method  : 'post', 
+            body : data
+        })
+        .then(function(response)
+        {
+            if(response.ok)
+            {
+                return response.json();
+            }
+            throw new Error('Network response was not ok.');
+            
+        })
+        .then(function(json){
+            {
+                self.close();
+                self.props.onAddScheme(json);
+            }
+            
+        })
+        .catch(function(error) {
+         console.log('There has been a problem with your fetch operation: ' + error.message);});
+    }
+
+    onConfirmDeleteScheme()
+    {
+        ajaxRequest('DeleteScheme', this.state.Scheme.id, this.props.onDeleteScheme, this);
     }
 
     onAddRootSchemeButtonClick()
@@ -278,6 +325,7 @@ class SchemeListBlock extends React.Component
                                                                                    id = {this.state.Scheme.id}/>}
                     {this.state.Scheme == null ? null : <EditSchemeModal show={this.state.EditSchemeModalShow}
                                                                                    onClose={this.close}
+                                                                                   onConfirmEditScheme = {this.onConfirmEditScheme}
                                                                                    name = {this.state.Scheme.name}
                                                                                    id = {this.state.Scheme.id}/>}
                     {this.state.Scheme == null ? null : <AddSchemeModal show={this.state.AddSchemeModalShow}
@@ -311,15 +359,26 @@ class AddSchemeModal extends React.Component
         this.onChangeName = this.onChangeName.bind(this);
         this.onClose = this.onClose.bind(this);
         this.onConfirm = this.onConfirm.bind(this);
+        this.onChangeImage = this.onChangeImage.bind(this);
+    }
+
+    onChangeImage(event)
+    {
+        this.setState
+        ({
+            imageFile : event.target.files[0]
+        })
+        console.log('Selected file:', event.target.files[0]);
     }
 
     onConfirm()
     {
         let parentSchemeId = (this.props.isRootScheme ? null : this.props.parentSchemeId);
-        this.props.onConfirmAddScheme(this.state.name, parentSchemeId)
+        this.props.onConfirmAddScheme(this.state.name, this.state.imageFile, parentSchemeId)
         this.setState
         ({
-            name : ''
+            name : '',
+            imageFile : null
         });
     }
 
@@ -350,9 +409,11 @@ class AddSchemeModal extends React.Component
                             <Modal.Title>Добавление схемы</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
+                        <p>{this.props.isRootScheme ? "корневая схема" : "дочерняя схема"}</p>
                         <h4>Название:</h4>
                         <input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
-                        <p>{this.props.isRootScheme ? "корневая схема" : "не корневая схема"}</p>
+                        <label >Изображение:</label>
+                        <input type="file"  onChange={this.onChangeImage}/>
                     </Modal.Body>
                     <Modal.Footer>
                         <button className="btn btn-primary"  onClick={this.onConfirm}>Подтвердить</button>
@@ -373,6 +434,16 @@ class EditSchemeModal extends React.Component
         }
         this.onChangeName = this.onChangeName.bind(this);
         this.onClose = this.onClose.bind(this);
+        this.onChangeImage = this.onChangeImage.bind(this);
+    }
+
+    onChangeImage(event)
+    {
+        this.setState
+        ({
+            imageFile : event.target.files[0]
+        })
+        console.log('Selected file:', event.target.files[0]);
     }
 
     onChangeName(event)
@@ -387,10 +458,6 @@ class EditSchemeModal extends React.Component
     onClose()
     {
         this.props.onClose();
-        // this.setState
-        // ({
-        //     name : this.props.name
-        // });
     }
 
 
@@ -402,23 +469,34 @@ class EditSchemeModal extends React.Component
                     </Modal.Header>
                     <Modal.Body>
                         <h4>Название:</h4>
-                        <form onSubmit={this.onClose}>
+                        {/*<form>*/}
+                        {/*<form >*/}
                             <div className="form-group">
                                 <label >Название:</label>
                                 <input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
                             </div>
                             <div className="form-group">
                                 <label >Изображение:</label>
-                                <input type="file" id="exampleInputFile"/>
+                                <input type="file"  onChange={this.onChangeImage}/>
                             </div>
-                            <button type="submit" className="btn btn-default">Submit</button>
-                        </form>
+                            {/*<form>
+                                <FileInput name="myImage"
+                                       accept=".png,.gif"
+                                       placeholder="My Image"
+                                       className="inputClass"
+                                       onChange={this.handleChange} />
+
+                            </form>*/}
+                            
+                            {/*<hr/>*/}
+                            {/*<button type="submit" className="btn btn-primary">Submit</button>
+                            <Button onClick={this.onClose}>Отмена</Button>*/}
+                        {/*</form>*/}
                         {/*<input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
                         <input type="file" id="exampleInputFile"/>*/}
                     </Modal.Body>
                     <Modal.Footer>
-                        {/*<button className="btn btn-primary"  onClick={this.onClose}>Подтвердить</button>*/}
-                        <button type="submit" className="btn btn-default">Submit</button>
+                        <button className="btn btn-primary"  onClick={this.props.onConfirmEditScheme.bind(this, this.state.name, this.state.imageFile)}>Подтвердить</button>
                         <Button onClick={this.onClose}>Отмена</Button>
                     </Modal.Footer>
               </Modal>
@@ -434,10 +512,10 @@ const DeleteSchemeModal = (props) =>
             <h4>Название:</h4>
             <p>{props.name}</p>
             <hr/>
-            <div className="alert alert-danger" role="alert">Внимание: удаление схемы повлечет за собой удаление всех дочерних схем!</div>
+            <div className="alert alert-danger" role="alert"><span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Внимание: удаление схемы повлечет за собой удаление всех дочерних схем!</div>
         </Modal.Body>
         <Modal.Footer>
-            <button className="btn btn-primary"  onClick={props.onConfirmDeleteScheme.bind(this, props.id)}>Подтвердить</button>
+            <button className="btn btn-primary"  onClick={props.onConfirmDeleteScheme}>Подтвердить</button>
             <Button onClick={props.onClose}>Отмена</Button>
         </Modal.Footer>
     </Modal>;
@@ -574,7 +652,6 @@ class PartListBlock extends React.Component
         this.onEditPartButtonClick = this.onEditPartButtonClick.bind(this);
         this.onDeletePartButtonClick = this.onDeletePartButtonClick.bind(this);
         this.onAddPartButtonClick = this.onAddPartButtonClick.bind(this);
-        // this.ajaxRequest = this.ajaxRequest.bind(this);
         this.close = this.close.bind(this);
         this.onConfirmEdit = this.onConfirmEdit.bind(this);
         this.onConfirmDelete = this.onConfirmDelete.bind(this);
@@ -621,36 +698,6 @@ class PartListBlock extends React.Component
              editedSchemePart : part
             });
     }
-
-    // ajaxRequest(actionName, item)
-    // {
-    //     var self = this;
-    //     var path = '/Default/'+actionName;
-
-    //     fetch(path, { 
-    //         method  : 'post', 
-    //         body : JSON.stringify(item)
-    //     })
-    //     .then(function(response)
-    //     {
-    //         if(response.ok)
-    //         {
-    //             return response.json();
-    //         }
-    //         throw new Error('Network response was not ok.');
-            
-    //     })
-    //     .then(function(json){
-    //         {
-    //             self.close();
-    //             self.props.onEditPart(json);
-    //         }
-            
-    //     })
-    //     .catch(function(error) {
-    //      console.log('There has been a problem with your fetch operation: ' + error.message);});
-    // }
-
     onConfirmAddSchemePart(article, name, count)
     {
         ajaxRequest('AddSchemePart', {article : article, name : name, count : count, schemeId : this.props.selectedSchemeId}, this.props.onEditPart, this);

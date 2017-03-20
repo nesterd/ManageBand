@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using Domain.Entities;
 using BusinessLogic.Context;
 using System.Data.Entity;
+using System.Web;
+using System.IO;
+using System.Web.Hosting;
 
 namespace BusinessLogic.Services
 {
@@ -164,10 +167,26 @@ namespace BusinessLogic.Services
             return _context.Details.Any(detail => detail.Article == article);
         }
 
-        public void AddScheme(Scheme scheme)
+        string GetSchemImagePath()
+        {
+            string fileName = Guid.NewGuid() + ".png";
+            return $"/images/{fileName}";
+        }
+
+        public string AddScheme(Scheme scheme)
         {
             _context.Schemes.Add(scheme);
             _context.SaveChanges();
+
+            var addedScheme = _context.Schemes.ToArray().LastOrDefault();
+            //string fileName = Guid.NewGuid() + ".png";
+            addedScheme.Image = GetSchemImagePath();/*$"/images/{fileName}";*/
+
+            _context.Entry(addedScheme).State = System.Data.Entity.EntityState.Modified;
+            _context.SaveChanges();
+
+            return addedScheme.Image;
+
         }
 
         public SchemeDTO GetLastScheme()
@@ -207,6 +226,29 @@ namespace BusinessLogic.Services
         {
 
             return SchemeDTOConstructor(GetDbSchemeById(id), GetDbSchemeList());
+        }
+
+        public string EditScheme(Scheme editedScheme, bool isNewImage)
+        {
+            var oldScheme = _context.Schemes.Find(editedScheme.Id);
+            if (oldScheme == null)
+                return  null;
+
+            oldScheme.Name = editedScheme.Name;
+
+            if(isNewImage)
+            {
+                var fullPath = HostingEnvironment.MapPath("~" + oldScheme.Image);
+                if (File.Exists(fullPath))
+                    File.Delete(fullPath);
+
+                oldScheme.Image = GetSchemImagePath();
+            }
+            
+            _context.SaveChanges();
+
+            return oldScheme.Image;
+
         }
     }
 }

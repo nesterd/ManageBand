@@ -16,7 +16,7 @@ namespace WebApplication1
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
-            //Database.SetInitializer(new DbContextInitializer());
+            Database.SetInitializer(new DbContextInitializer());
         }
     }
 }

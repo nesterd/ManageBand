@@ -73,21 +73,47 @@ namespace WebApplication1.Controllers
             return Json(_schemeService.GetArticles(model));
         }
 
+        void ImageLoader(string fileName, HttpRequestBase request)
+        {
+            
+            var image = request.Files["image"];
+            if (image != null)
+            {
+                image.SaveAs(Server.MapPath("~" + fileName));
+            }
+        }
+
         [HttpPost]
         public ActionResult AddScheme()
         {
-            var jsonString = new StreamReader(Request.InputStream).ReadToEnd();
-            var model = JsonConvert.DeserializeObject<Scheme>(jsonString);
-            _schemeService.AddScheme(model);
+            
+            var parentSchemeId = Request["parentSchemeId"];
+            int? parentId;
+
+            if (parentSchemeId == "null")
+                parentId = null;
+
+            else
+                parentId = int.Parse(parentSchemeId);
+
+            var fileName = _schemeService.AddScheme(new Scheme { Name = Request["name"], ParentId = parentId });
+
+            ImageLoader(fileName, Request);
 
             return Json(_schemeService.GetLastScheme());
         }
 
-        //[HttpPost]
-        //public ActionResult EditScheme()
-        //{
+        [HttpPost]
+        public ActionResult EditScheme()
+        {
+            var id = int.Parse(Request["id"]);
+            var isNewImage = Request.Files["image"] != null;
+            var fileName = _schemeService.EditScheme(new Scheme { Id = id, Name = Request["name"] }, isNewImage);
+            if (isNewImage)
+                ImageLoader(fileName, Request);
 
-        //}
+            return Json(_schemeService.GetSchemeById(id));
+        }
 
         [HttpPost]
         public ActionResult DeleteScheme()

@@ -10,6 +10,7 @@
     "react": "^15.4.2",
     "react-bootstrap": "^0.30.8",
     "react-dom": "^15.4.2",
+    "react-file-input": "^0.2.5",
     "react-select": "^1.0.0-rc.3",
     "react-sticky": "^5.0.5",
     "whatwg-fetch": "^2.0.3"

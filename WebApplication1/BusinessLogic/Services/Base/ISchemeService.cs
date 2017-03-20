@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace BusinessLogic.Services.Base
 {
@@ -20,9 +21,10 @@ namespace BusinessLogic.Services.Base
         void DeletePart(int schemePartId);
         IEnumerable<SelectOptionDTO> GetArticles(string partOfArticle);
         void AddSchemePart(AddSchemePartDTO addSchemePart);
-        void AddScheme(Scheme scheme);
+        string AddScheme(Scheme scheme);
         void DeleteScheme(int id);
         SchemeDTO GetSchemeById(int id);
+        string EditScheme(Scheme editedScheme, bool isNewImage);
 
     }
 }

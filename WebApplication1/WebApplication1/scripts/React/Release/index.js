@@ -23,10 +23,10 @@ webpackJsonp([0,1],[
 	var Button = __webpack_require__(/*! react-bootstrap */ 182).Button;
 	var FieldGroup = __webpack_require__(/*! react-bootstrap */ 182).FieldGroup;
 	var Select = __webpack_require__(/*! react-select */ 435);
+	var FileInput = __webpack_require__(/*! react-file-input */ 447);
 	
 	
 	var ajaxRequest = function ajaxRequest(actionName, item, method, self) {
-	    // var self = this;
 	    var path = '/Default/' + actionName;
 	
 	    fetch(path, {
@@ -63,8 +63,9 @@ webpackJsonp([0,1],[
 	        _this.handleOnExpand = _this.handleOnExpand.bind(_this);
 	        _this.handleOnSelect = _this.handleOnSelect.bind(_this);
 	        _this.onEditPart = _this.onEditPart.bind(_this);
-	        _this.onEditScheme = _this.onEditScheme.bind(_this);
+	        _this.onAddScheme = _this.onAddScheme.bind(_this);
 	        _this.onDeleteScheme = _this.onDeleteScheme.bind(_this);
+	        _this.onEditScheme = _this.onEditScheme.bind(_this);
 	        return _this;
 	    }
 	
@@ -80,6 +81,16 @@ webpackJsonp([0,1],[
 	            if (schemeParts == undefined) list.push(newSchemePartsList);else schemeParts.parts = newSchemePartsList.parts;
 	
 	            this.setState({ schemaParts: list });
+	        }
+	    }, {
+	        key: 'onEditScheme',
+	        value: function onEditScheme(editedScheme) {
+	            var list = this.state.schemeList.slice();
+	            var oldScheme = this.findElement(editedScheme.id, list);
+	            oldScheme.name = editedScheme.name;
+	            oldScheme.image = editedScheme.image;
+	
+	            this.setState({ schemeList: list });
 	        }
 	    }, {
 	        key: 'onDeleteScheme',
@@ -102,8 +113,8 @@ webpackJsonp([0,1],[
 	            this.setState({ schemeList: list });
 	        }
 	    }, {
-	        key: 'onEditScheme',
-	        value: function onEditScheme(newScheme) {
+	        key: 'onAddScheme',
+	        value: function onAddScheme(newScheme) {
 	            var list = this.state.schemeList.slice();
 	            if (newScheme.parentId == null) {
 	                list.push(newScheme);
@@ -113,7 +124,6 @@ webpackJsonp([0,1],[
 	                schema.isExpand = true;
 	            }
 	            this.setState({ schemeList: list });
-	            // this.setState({schemeList : newSchemeList});
 	        }
 	    }, {
 	        key: 'findElement',
@@ -160,6 +170,7 @@ webpackJsonp([0,1],[
 	                    isAdmin: this.state.isAdmin,
 	                    onExpand: this.handleOnExpand,
 	                    onSelect: this.handleOnSelect,
+	                    onAddScheme: this.onAddScheme,
 	                    onEditScheme: this.onEditScheme,
 	                    onDeleteScheme: this.onDeleteScheme,
 	                    selectedSchemeId: this.state.selectedScheme != undefined ? this.state.selectedScheme.id : null }),
@@ -202,48 +213,70 @@ webpackJsonp([0,1],[
 	        _this4.onAddSchemeButtonClick = _this4.onAddSchemeButtonClick.bind(_this4);
 	        _this4.onEditSchemeButtonClick = _this4.onEditSchemeButtonClick.bind(_this4);
 	        _this4.onDeleteSchemeButtonClick = _this4.onDeleteSchemeButtonClick.bind(_this4);
-	        // this.ajaxSchemeRequest = this.ajaxSchemeRequest.bind(this);
+	        _this4.onConfirmEditScheme = _this4.onConfirmEditScheme.bind(_this4);
 	        return _this4;
 	    }
 	
-	    // ajaxSchemeRequest(actionName, item, method)
-	    // {
-	    //     var self = this;
-	    //     var path = '/Default/'+actionName;
-	
-	    //     fetch(path, { 
-	    //         method  : 'post', 
-	    //         body : JSON.stringify(item)
-	    //     })
-	    //     .then(function(response)
-	    //     {
-	    //         if(response.ok)
-	    //         {
-	    //             return response.json();
-	    //         }
-	    //         throw new Error('Network response was not ok.');
-	
-	    //     })
-	    //     .then(function(json){
-	    //         {
-	    //             self.close();
-	    //             method(json);
-	    //         }
-	
-	    //     })
-	    //     .catch(function(error) {
-	    //      console.log('There has been a problem with your fetch operation: ' + error.message);});
-	    // }
-	
 	    _createClass(SchemeListBlock, [{
+	        key: 'onConfirmEditScheme',
+	        value: function onConfirmEditScheme(name, imageFile) {
+	            // ajaxRequest('EditScheme', {name : name, id : this.state.Scheme.id, file : imageFile}, this.props.onEditScheme, this);
+	            var self = this;
+	            var path = '/Default/EditScheme';
+	            var data = new FormData();
+	            data.append('name', name);
+	            data.append('id', this.state.Scheme.id);
+	            data.append('image', imageFile);
+	
+	            fetch(path, {
+	                method: 'post',
+	                body: data
+	            }).then(function (response) {
+	                if (response.ok) {
+	                    return response.json();
+	                }
+	                throw new Error('Network response was not ok.');
+	            }).then(function (json) {
+	                {
+	                    self.close();
+	                    self.props.onEditScheme(json);
+	                }
+	            }).catch(function (error) {
+	                console.log('There has been a problem with your fetch operation: ' + error.message);
+	            });
+	        }
+	    }, {
 	        key: 'onConfirmAddScheme',
-	        value: function onConfirmAddScheme(name, parentSchemeId) {
-	            ajaxRequest('AddScheme', { name: name, parentId: parentSchemeId }, this.props.onEditScheme, this);
+	        value: function onConfirmAddScheme(name, imageFile, parentSchemeId) {
+	            // ajaxRequest('AddScheme', {name : name, parentId : parentSchemeId}, this.props.onAddScheme, this);
+	            var self = this;
+	            var path = '/Default/AddScheme';
+	            var data = new FormData();
+	            data.append('name', name);
+	            data.append('parentSchemeId', parentSchemeId);
+	            data.append('image', imageFile);
+	
+	            fetch(path, {
+	                method: 'post',
+	                body: data
+	            }).then(function (response) {
+	                if (response.ok) {
+	                    return response.json();
+	                }
+	                throw new Error('Network response was not ok.');
+	            }).then(function (json) {
+	                {
+	                    self.close();
+	                    self.props.onAddScheme(json);
+	                }
+	            }).catch(function (error) {
+	                console.log('There has been a problem with your fetch operation: ' + error.message);
+	            });
 	        }
 	    }, {
 	        key: 'onConfirmDeleteScheme',
-	        value: function onConfirmDeleteScheme(id) {
-	            ajaxRequest('DeleteScheme', id, this.props.onDeleteScheme, this);
+	        value: function onConfirmDeleteScheme() {
+	            ajaxRequest('DeleteScheme', this.state.Scheme.id, this.props.onDeleteScheme, this);
 	        }
 	    }, {
 	        key: 'onAddRootSchemeButtonClick',
@@ -303,6 +336,7 @@ webpackJsonp([0,1],[
 	                    id: this.state.Scheme.id }),
 	                this.state.Scheme == null ? null : React.createElement(EditSchemeModal, { show: this.state.EditSchemeModalShow,
 	                    onClose: this.close,
+	                    onConfirmEditScheme: this.onConfirmEditScheme,
 	                    name: this.state.Scheme.name,
 	                    id: this.state.Scheme.id }),
 	                this.state.Scheme == null ? null : React.createElement(AddSchemeModal, { show: this.state.AddSchemeModalShow,
@@ -340,16 +374,26 @@ webpackJsonp([0,1],[
 	        _this5.onChangeName = _this5.onChangeName.bind(_this5);
 	        _this5.onClose = _this5.onClose.bind(_this5);
 	        _this5.onConfirm = _this5.onConfirm.bind(_this5);
+	        _this5.onChangeImage = _this5.onChangeImage.bind(_this5);
 	        return _this5;
 	    }
 	
 	    _createClass(AddSchemeModal, [{
+	        key: 'onChangeImage',
+	        value: function onChangeImage(event) {
+	            this.setState({
+	                imageFile: event.target.files[0]
+	            });
+	            console.log('Selected file:', event.target.files[0]);
+	        }
+	    }, {
 	        key: 'onConfirm',
 	        value: function onConfirm() {
 	            var parentSchemeId = this.props.isRootScheme ? null : this.props.parentSchemeId;
-	            this.props.onConfirmAddScheme(this.state.name, parentSchemeId);
+	            this.props.onConfirmAddScheme(this.state.name, this.state.imageFile, parentSchemeId);
 	            this.setState({
-	                name: ''
+	                name: '',
+	                imageFile: null
 	            });
 	        }
 	    }, {
@@ -387,16 +431,22 @@ webpackJsonp([0,1],[
 	                    Modal.Body,
 	                    null,
 	                    React.createElement(
+	                        'p',
+	                        null,
+	                        this.props.isRootScheme ? "корневая схема" : "дочерняя схема"
+	                    ),
+	                    React.createElement(
 	                        'h4',
 	                        null,
 	                        '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435:'
 	                    ),
 	                    React.createElement('input', { type: 'text', className: 'form-control', value: this.state.name, onChange: this.onChangeName }),
 	                    React.createElement(
-	                        'p',
+	                        'label',
 	                        null,
-	                        this.props.isRootScheme ? "корневая схема" : "не корневая схема"
-	                    )
+	                        '\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435:'
+	                    ),
+	                    React.createElement('input', { type: 'file', onChange: this.onChangeImage })
 	                ),
 	                React.createElement(
 	                    Modal.Footer,
@@ -432,10 +482,19 @@ webpackJsonp([0,1],[
 	        };
 	        _this6.onChangeName = _this6.onChangeName.bind(_this6);
 	        _this6.onClose = _this6.onClose.bind(_this6);
+	        _this6.onChangeImage = _this6.onChangeImage.bind(_this6);
 	        return _this6;
 	    }
 	
 	    _createClass(EditSchemeModal, [{
+	        key: 'onChangeImage',
+	        value: function onChangeImage(event) {
+	            this.setState({
+	                imageFile: event.target.files[0]
+	            });
+	            console.log('Selected file:', event.target.files[0]);
+	        }
+	    }, {
 	        key: 'onChangeName',
 	        value: function onChangeName(event) {
 	            this.setState({
@@ -446,10 +505,6 @@ webpackJsonp([0,1],[
 	        key: 'onClose',
 	        value: function onClose() {
 	            this.props.onClose();
-	            // this.setState
-	            // ({
-	            //     name : this.props.name
-	            // });
 	        }
 	    }, {
 	        key: 'render',
@@ -475,33 +530,24 @@ webpackJsonp([0,1],[
 	                        '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435:'
 	                    ),
 	                    React.createElement(
-	                        'form',
-	                        { onSubmit: this.onClose },
+	                        'div',
+	                        { className: 'form-group' },
 	                        React.createElement(
-	                            'div',
-	                            { className: 'form-group' },
-	                            React.createElement(
-	                                'label',
-	                                null,
-	                                '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435:'
-	                            ),
-	                            React.createElement('input', { type: 'text', className: 'form-control', value: this.state.name, onChange: this.onChangeName })
+	                            'label',
+	                            null,
+	                            '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435:'
 	                        ),
+	                        React.createElement('input', { type: 'text', className: 'form-control', value: this.state.name, onChange: this.onChangeName })
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        { className: 'form-group' },
 	                        React.createElement(
-	                            'div',
-	                            { className: 'form-group' },
-	                            React.createElement(
-	                                'label',
-	                                null,
-	                                '\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435:'
-	                            ),
-	                            React.createElement('input', { type: 'file', id: 'exampleInputFile' })
+	                            'label',
+	                            null,
+	                            '\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435:'
 	                        ),
-	                        React.createElement(
-	                            'button',
-	                            { type: 'submit', className: 'btn btn-default' },
-	                            'Submit'
-	                        )
+	                        React.createElement('input', { type: 'file', onChange: this.onChangeImage })
 	                    )
 	                ),
 	                React.createElement(
@@ -509,8 +555,8 @@ webpackJsonp([0,1],[
 	                    null,
 	                    React.createElement(
 	                        'button',
-	                        { type: 'submit', className: 'btn btn-default' },
-	                        'Submit'
+	                        { className: 'btn btn-primary', onClick: this.props.onConfirmEditScheme.bind(this, this.state.name, this.state.imageFile) },
+	                        '\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C'
 	                    ),
 	                    React.createElement(
 	                        Button,
@@ -555,7 +601,8 @@ webpackJsonp([0,1],[
 	            React.createElement(
 	                'div',
 	                { className: 'alert alert-danger', role: 'alert' },
-	                '\u0412\u043D\u0438\u043C\u0430\u043D\u0438\u0435: \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u0435 \u0441\u0445\u0435\u043C\u044B \u043F\u043E\u0432\u043B\u0435\u0447\u0435\u0442 \u0437\u0430 \u0441\u043E\u0431\u043E\u0439 \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u0435 \u0432\u0441\u0435\u0445 \u0434\u043E\u0447\u0435\u0440\u043D\u0438\u0445 \u0441\u0445\u0435\u043C!'
+	                React.createElement('span', { className: 'glyphicon glyphicon-exclamation-sign', 'aria-hidden': 'true' }),
+	                ' \u0412\u043D\u0438\u043C\u0430\u043D\u0438\u0435: \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u0435 \u0441\u0445\u0435\u043C\u044B \u043F\u043E\u0432\u043B\u0435\u0447\u0435\u0442 \u0437\u0430 \u0441\u043E\u0431\u043E\u0439 \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u0435 \u0432\u0441\u0435\u0445 \u0434\u043E\u0447\u0435\u0440\u043D\u0438\u0445 \u0441\u0445\u0435\u043C!'
 	            )
 	        ),
 	        React.createElement(
@@ -563,7 +610,7 @@ webpackJsonp([0,1],[
 	            null,
 	            React.createElement(
 	                'button',
-	                { className: 'btn btn-primary', onClick: props.onConfirmDeleteScheme.bind(undefined, props.id) },
+	                { className: 'btn btn-primary', onClick: props.onConfirmDeleteScheme },
 	                '\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C'
 	            ),
 	            React.createElement(
@@ -806,7 +853,6 @@ webpackJsonp([0,1],[
 	        _this12.onEditPartButtonClick = _this12.onEditPartButtonClick.bind(_this12);
 	        _this12.onDeletePartButtonClick = _this12.onDeletePartButtonClick.bind(_this12);
 	        _this12.onAddPartButtonClick = _this12.onAddPartButtonClick.bind(_this12);
-	        // this.ajaxRequest = this.ajaxRequest.bind(this);
 	        _this12.close = _this12.close.bind(_this12);
 	        _this12.onConfirmEdit = _this12.onConfirmEdit.bind(_this12);
 	        _this12.onConfirmDelete = _this12.onConfirmDelete.bind(_this12);
@@ -855,36 +901,6 @@ webpackJsonp([0,1],[
 	                editedSchemePart: part
 	            });
 	        }
-	
-	        // ajaxRequest(actionName, item)
-	        // {
-	        //     var self = this;
-	        //     var path = '/Default/'+actionName;
-	
-	        //     fetch(path, { 
-	        //         method  : 'post', 
-	        //         body : JSON.stringify(item)
-	        //     })
-	        //     .then(function(response)
-	        //     {
-	        //         if(response.ok)
-	        //         {
-	        //             return response.json();
-	        //         }
-	        //         throw new Error('Network response was not ok.');
-	
-	        //     })
-	        //     .then(function(json){
-	        //         {
-	        //             self.close();
-	        //             self.props.onEditPart(json);
-	        //         }
-	
-	        //     })
-	        //     .catch(function(error) {
-	        //      console.log('There has been a problem with your fetch operation: ' + error.message);});
-	        // }
-	
 	    }, {
 	        key: 'onConfirmAddSchemePart',
 	        value: function onConfirmAddSchemePart(article, name, count) {
@@ -46191,6 +46207,80 @@ webpackJsonp([0,1],[
 	});
 	
 	module.exports = Value;
+
+/***/ },
+/* 447 */
+/*!*****************************************!*\
+  !*** ./~/react-file-input/lib/index.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 5);
+	
+	var FileInput = React.createClass({
+	  getInitialState: function() {
+	    return {
+	      value: '',
+	      styles: {
+	        parent: {
+	          position: 'relative'
+	        },
+	        file: {
+	          position: 'absolute',
+	          top: 0,
+	          left: 0,
+	          opacity: 0,
+	          width: '100%',
+	          zIndex: 1
+	        },
+	        text: {
+	          position: 'relative',
+	          zIndex: -1
+	        }
+	      }
+	    };
+	  },
+	
+	  handleChange: function(e) {
+	    this.setState({
+	      value: e.target.value.split(/(\\|\/)/g).pop()
+	    });
+	    if (this.props.onChange) this.props.onChange(e);
+	  },
+	
+	  render: function() {
+	    return React.DOM.div({
+	        style: this.state.styles.parent
+	      },
+	
+	      // Actual file input
+	      React.DOM.input({
+	        type: 'file',
+	        name: this.props.name,
+	        className: this.props.className,
+	        onChange: this.handleChange,
+	        disabled: this.props.disabled,
+	        accept: this.props.accept,
+	        style: this.state.styles.file
+	      }),
+	
+	      // Emulated file input
+	      React.DOM.input({
+	        type: 'text',
+	        tabIndex: -1,
+	        name: this.props.name + '_filename',
+	        value: this.state.value,
+	        className: this.props.className,
+	        onChange: function() {},
+	        placeholder: this.props.placeholder,
+	        disabled: this.props.disabled,
+	        style: this.state.styles.text
+	      }));
+	  }
+	});
+	
+	module.exports = FileInput;
+
 
 /***/ }
 ]);

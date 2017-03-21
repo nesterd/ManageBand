@@ -23,22 +23,25 @@ namespace BusinessLogic.Initializers
             context.Details.AddRange(detailList);
             context.SaveChanges();
 
-            context.Schemes.Add(new Scheme { Name = "rootScheme", Image = $"/images/catRoot.png" });
+            context.Catalogue.Add(new Catalogue { Name = "Cat1" });
+            context.SaveChanges();
+
+            context.Schemes.Add(new Scheme { Name = "rootScheme", Image = $"/images/catRoot.png", CatalogueId = 1 });
             context.SaveChanges();
 
             context.Schemes.AddRange(new List<Scheme>
             {
-                new Scheme { ParentId = 1, Name = "scheme_1", Image =  $"/images/scheme_1.png" },
-                new Scheme { ParentId = 1, Name = "scheme_2", Image =  $"/images/scheme_2.png"  },
-                new Scheme { ParentId = 1, Name = "scheme_3", Image =  $"/images/scheme_3.png"  },
-                new Scheme { ParentId = 2, Name = "scheme_4", Image =  $"/images/scheme_4.png"  },
-                new Scheme { ParentId = 2, Name = "scheme_5", Image =  $"/images/scheme_5.png"  },
-                new Scheme { ParentId = 2, Name = "scheme_6", Image =  $"/images/scheme_6.png"  },
-                new Scheme { ParentId = 3, Name = "scheme_7", Image =  $"/images/scheme_7.png"  },
-                new Scheme { ParentId = 3, Name = "scheme_8", Image =  $"/images/scheme_8.png"  },
-                new Scheme { ParentId = 4, Name = "scheme_9", Image =  $"/images/scheme_9.png"  },
-                new Scheme { ParentId = 4, Name = "scheme_10", Image =  $"/images/scheme_10.png"  },
-                new Scheme { ParentId = 4, Name = "scheme_11", Image =  $"/images/scheme_11.png"  }
+                new Scheme { ParentId = 1, Name = "scheme_1", Image =  $"/images/scheme_1.png", CatalogueId = 1 },
+                new Scheme { ParentId = 1, Name = "scheme_2", Image =  $"/images/scheme_2.png", CatalogueId = 1  },
+                new Scheme { ParentId = 1, Name = "scheme_3", Image =  $"/images/scheme_3.png", CatalogueId = 1  },
+                new Scheme { ParentId = 2, Name = "scheme_4", Image =  $"/images/scheme_4.png", CatalogueId = 1  },
+                new Scheme { ParentId = 2, Name = "scheme_5", Image =  $"/images/scheme_5.png", CatalogueId = 1  },
+                new Scheme { ParentId = 2, Name = "scheme_6", Image =  $"/images/scheme_6.png", CatalogueId = 1  },
+                new Scheme { ParentId = 3, Name = "scheme_7", Image =  $"/images/scheme_7.png" , CatalogueId = 1 },
+                new Scheme { ParentId = 3, Name = "scheme_8", Image =  $"/images/scheme_8.png", CatalogueId = 1  },
+                new Scheme { ParentId = 4, Name = "scheme_9", Image =  $"/images/scheme_9.png", CatalogueId = 1  },
+                new Scheme { ParentId = 4, Name = "scheme_10", Image =  $"/images/scheme_10.png", CatalogueId = 1  },
+                new Scheme { ParentId = 4, Name = "scheme_11", Image =  $"/images/scheme_11.png", CatalogueId = 1  }
             });
             context.SaveChanges();
 

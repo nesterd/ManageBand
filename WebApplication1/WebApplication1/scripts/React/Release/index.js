@@ -58,7 +58,8 @@ webpackJsonp([0,1],[
 	        _this.state = {
 	            isAdmin: true,
 	            schemeList: window.schemeList,
-	            schemaParts: window.schemePartsList
+	            schemaParts: window.schemePartsList,
+	            catalogueId: window.selectedCatalogueId
 	        };
 	        _this.handleOnExpand = _this.handleOnExpand.bind(_this);
 	        _this.handleOnSelect = _this.handleOnSelect.bind(_this);
@@ -168,6 +169,7 @@ webpackJsonp([0,1],[
 	                { className: 'row' },
 	                React.createElement(SchemeListBlock, { schemeList: this.state.schemeList,
 	                    isAdmin: this.state.isAdmin,
+	                    catalogueId: this.state.catalogueId,
 	                    onExpand: this.handleOnExpand,
 	                    onSelect: this.handleOnSelect,
 	                    onAddScheme: this.onAddScheme,
@@ -254,6 +256,7 @@ webpackJsonp([0,1],[
 	            var data = new FormData();
 	            data.append('name', name);
 	            data.append('parentSchemeId', parentSchemeId);
+	            data.append('catalogueId', this.props.catalogueId);
 	            data.append('image', imageFile);
 	
 	            fetch(path, {

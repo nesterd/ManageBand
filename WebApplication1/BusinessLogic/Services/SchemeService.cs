@@ -25,19 +25,29 @@ namespace BusinessLogic.Services
             _context = new PartsCatalogueDbContext();
         }
 
+        public IEnumerable<Catalogue> GetCatalogueList()
+        {
+            return _context.Catalogue.ToArray();
+        }
+
         string GetJSONString(object obj)
         {
             return JsonConvert.SerializeObject(obj);
         }
 
-        public string GetSchemeListInJSON()
+        public string GetSchemeListInJSON(int catalogueId)
         {
-            return GetJSONString(GetSchemeList());
+            return GetJSONString(GetSchemeList(catalogueId));
         }
 
         IEnumerable<Scheme> GetDbSchemeList()
         {
             return _context.Schemes.ToArray();
+        }
+
+        IEnumerable<Scheme> GetDbSchemeList(int catalogueId)
+        {
+            return _context.Schemes.Where(scheme => scheme.CatalogueId == catalogueId).ToArray();
         }
 
         SchemeDTO SchemeDTOConstructor(Scheme scheme, IEnumerable<Scheme> baseSchemeList)
@@ -51,9 +61,9 @@ namespace BusinessLogic.Services
                 );
         }
 
-        public IEnumerable<SchemeDTO> GetSchemeList()
+        public IEnumerable<SchemeDTO> GetSchemeList(int catalogueId)
         {
-            var baseSchemeList = GetDbSchemeList();
+            var baseSchemeList = GetDbSchemeList(catalogueId);
             var list2 = baseSchemeList
                 .Where(x => x.ParentId == null)
                 .Select(item => SchemeDTOConstructor(item, baseSchemeList));
@@ -61,44 +71,67 @@ namespace BusinessLogic.Services
             return list2;
         }
 
-        public string GetSchemePartListInJSON()
+        public string GetSchemePartListInJSON(int catalogueId)
         {
-            return GetJSONString(GetSchemePartList());
+            return GetJSONString(GetSchemePartList(catalogueId));
         }
 
-        public IEnumerable<SchemePartsDTO> GetSchemePartList()
+         
+
+        public IEnumerable<SchemePartsDTO> GetSchemePartList(int catalogueId)
         {
-            var schemePartList = _context.SchemeParts.ToArray();
+            var filteredSchemeIdList = GetDbSchemeList(catalogueId).Select(scheme => scheme.Id);
+
+            var schemePartList = _context.SchemeParts.Where(schemePart => filteredSchemeIdList.Contains(schemePart.SchemeId)).ToArray();
             var schemeIdList = schemePartList.Select(x => x.SchemeId).Distinct().ToArray();
             var details = _context.Details.ToArray();
 
             return schemeIdList
                 .Select(x => new SchemePartsDTO
                                  (
-                                     x, 
-                                     schemePartList
-                                         .Where(schemePartPair => schemePartPair.SchemeId == x)
-                                         .Select(schemePartPair => 
+                                     x, GetPartListBySchemeId(x, schemePartList.Where(schemePartPair => schemePartPair.SchemeId == x), details)));
+                                 //schemePartList
+                                 //    .Where(schemePartPair => schemePartPair.SchemeId == x)
+                                 //    .Select(schemePartPair => 
+                                 //         new Part
+                                 //         {
+                                 //             count = schemePartPair.Count,
+                                 //             name = details
+                                 //                .FirstOrDefault(detail => detail.Id == schemePartPair.PartId)
+                                 //                .Name,
+                                 //             article = details
+                                 //                .FirstOrDefault(detail => detail.Id == schemePartPair.PartId)
+                                 //                .Article,
+                                 //             detailId = schemePartPair.PartId,
+                                 //             schemePartId = schemePartPair.Id
+                                 //         })
+                                 //    .ToArray()
+                                 //));
+
+        }
+
+        IEnumerable<Part> GetPartListBySchemeId(int schemeId, IEnumerable<SchemePart> schemePartList, IEnumerable<Detail> detailList)
+        {
+            return schemePartList.Select(schemePartPair =>
                                               new Part
                                               {
                                                   count = schemePartPair.Count,
-                                                  name = details
+                                                  name = detailList
                                                      .FirstOrDefault(detail => detail.Id == schemePartPair.PartId)
                                                      .Name,
-                                                  article = details
+                                                  article = detailList
                                                      .FirstOrDefault(detail => detail.Id == schemePartPair.PartId)
                                                      .Article,
                                                   detailId = schemePartPair.PartId,
                                                   schemePartId = schemePartPair.Id
                                               })
-                                         .ToArray()
-                                 ));
-
+                                         .ToArray();
         }
 
         public SchemePartsDTO GetPartsBySchemeId(int schemeId)
         {
-            var schemeParts = GetSchemePartList().FirstOrDefault(x => x.schemeId == schemeId);
+            var schemeParts = new SchemePartsDTO(schemeId, GetPartListBySchemeId(schemeId, _context.SchemeParts.Where(schemePart => schemePart.SchemeId == schemeId), _context.Details.ToArray()));
+            //var schemeParts = GetSchemePartList().FirstOrDefault(x => x.schemeId == schemeId);
             return schemeParts != null ? schemeParts : new SchemePartsDTO(schemeId, new List<Part>());
         }
 
@@ -249,6 +282,38 @@ namespace BusinessLogic.Services
             if (File.Exists(fullPath))
                 File.Delete(fullPath);
 
+        }
+
+        public void AddCatalogue(Catalogue catalogue)
+        {
+            _context.Catalogue.Add(catalogue);
+            _context.SaveChanges();
+        }
+
+        public void EditCatalogue(Catalogue catalogue)
+        {
+            var oldCatalogue = _context.Catalogue.Find(catalogue.Id);
+            oldCatalogue.Name = catalogue.Name;
+            _context.Entry(oldCatalogue).State = System.Data.Entity.EntityState.Modified;
+            _context.SaveChanges();
+        }
+
+        public void DeleteCatalogue(int id)
+        {
+            var catalogue = _context.Catalogue.Find(id);
+            if (catalogue == null)
+                return;
+            var schemeListToDelete = _context.Schemes.Where(scheme => scheme.CatalogueId == id).ToArray();
+            foreach (var scheme in schemeListToDelete)
+                DeleteScheme(scheme.Id);
+
+            _context.Catalogue.Remove(catalogue);
+            _context.SaveChanges();
+        }
+
+        public Catalogue GetCatalogueById(int id)
+        {
+            return _context.Catalogue.Find(id);
         }
     }
 }

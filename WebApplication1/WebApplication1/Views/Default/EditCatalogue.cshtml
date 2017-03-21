@@ -1,0 +1,19 @@
+﻿@model WebApplication1.Models.Default.CatalogueViewModel
+@{
+    ViewBag.Title = "EditCatalogue";
+    bool isAdding = ViewBag.IsAdding;
+    string actionName = isAdding ? "AddCatalogue" : "EditCatalogue";
+}
+
+<h2>EditCatalogue</h2>
+
+@using (Html.BeginForm(actionName))
+{
+    <div class="form-group">
+        @Html.LabelFor(x => x.Name)
+        @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+    </div>
+
+    <input type="submit" class="btn btn-success" value="Добавить" />
+    <a class="btn btn-default" href="@Url.Action("CatalogueList")">Отмена</a>
+}

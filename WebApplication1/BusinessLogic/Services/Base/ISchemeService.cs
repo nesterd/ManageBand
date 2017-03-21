@@ -11,11 +11,11 @@ namespace BusinessLogic.Services.Base
 {
     public interface ISchemeService
     {
-        string GetSchemeListInJSON();
-        IEnumerable<SchemeDTO> GetSchemeList();
+        string GetSchemeListInJSON(int catalogueId);
+        IEnumerable<SchemeDTO> GetSchemeList(int catalogueId);
         SchemeDTO GetLastScheme();
-        string GetSchemePartListInJSON();
-        IEnumerable<SchemePartsDTO> GetSchemePartList();
+        string GetSchemePartListInJSON(int catalogueId);
+        IEnumerable<SchemePartsDTO> GetSchemePartList(int catalogueId);
         SchemePartsDTO GetPartsBySchemeId(int schemeId);
         void EditPartCount(int schemePartId, int newCount);
         void DeletePart(int schemePartId);
@@ -25,6 +25,14 @@ namespace BusinessLogic.Services.Base
         void DeleteScheme(int id);
         SchemeDTO GetSchemeById(int id);
         string EditScheme(Scheme editedScheme, bool isNewImage);
+
+
+        IEnumerable<Catalogue> GetCatalogueList();
+        Catalogue GetCatalogueById(int id);
+        void AddCatalogue(Catalogue catalogue);
+        void EditCatalogue(Catalogue catalogue);
+        void DeleteCatalogue(int id);
+
 
     }
 }

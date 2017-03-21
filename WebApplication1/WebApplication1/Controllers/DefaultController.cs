@@ -22,13 +22,53 @@ namespace WebApplication1.Controllers
         {
             _schemeService = new SchemeService();
         }
+        
+        [HttpGet]
+        public ActionResult DeleteCatalogue(int id)
+        {
+            _schemeService.DeleteCatalogue(id);
+            return RedirectToAction("CatalogueList");
+        }
+        [HttpGet]
+        public ActionResult AddCatalogue()
+        {
+            ViewBag.IsAdding = true;
+            return View("EditCatalogue");
+        }
+
+        [HttpPost]
+        public ActionResult AddCatalogue(CatalogueViewModel catalogue)
+        {
+            _schemeService.AddCatalogue(new Catalogue { Name = catalogue.Name });
+            return RedirectToAction("CatalogueList");
+        }
+
+        [HttpGet]
+        public ActionResult EditCatalogue(int id)
+        {
+            var catalogue = _schemeService.GetCatalogueById(id);
+            ViewBag.IsAdding = false;
+            return View(new CatalogueViewModel { Id = catalogue.Id, Name = catalogue.Name});
+        }
+
+        [HttpPost]
+        public ActionResult EditCatalogue(CatalogueViewModel catalogue)
+        {
+            _schemeService.EditCatalogue(new Catalogue { Name = catalogue.Name, Id = catalogue.Id });
+            return RedirectToAction("CatalogueList");
+        }
+
+        public ActionResult CatalogueList()
+        {
+            return View(_schemeService.GetCatalogueList());
+        }
        
-        public ActionResult Index()
+        public ActionResult Catalogue(int id)
         {
 
-            ViewBag.SchemeListInJSON = _schemeService.GetSchemeListInJSON();
-            ViewBag.SchemePartsListInJSON = _schemeService.GetSchemePartListInJSON();
-
+            ViewBag.SchemeListInJSON = _schemeService.GetSchemeListInJSON(id);
+            ViewBag.SchemePartsListInJSON = _schemeService.GetSchemePartListInJSON(id);
+            ViewBag.CatalogueId = id;
             return View();
         }
 
@@ -95,7 +135,7 @@ namespace WebApplication1.Controllers
             else
                 parentId = int.Parse(parentSchemeId);
 
-            var fileName = _schemeService.AddScheme(new Scheme { Name = Request["name"], ParentId = parentId });
+            var fileName = _schemeService.AddScheme(new Scheme { Name = Request["name"], ParentId = parentId, CatalogueId = int.Parse(Request["catalogueId"]) });
 
             ImageLoader(fileName, Request);
 

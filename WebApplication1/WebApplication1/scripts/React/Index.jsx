@@ -47,7 +47,8 @@ class PartsCatalogue extends React.Component
             {
                 isAdmin : true,
                 schemeList: window.schemeList,
-                schemaParts : window.schemePartsList
+                schemaParts : window.schemePartsList,
+                catalogueId : window.selectedCatalogueId
             };
         this.handleOnExpand = this.handleOnExpand.bind(this);
         this.handleOnSelect = this.handleOnSelect.bind(this);
@@ -147,7 +148,8 @@ class PartsCatalogue extends React.Component
     render() {
         return <div className="row">
                    <SchemeListBlock schemeList={this.state.schemeList}
-                                    isAdmin ={this.state.isAdmin} 
+                                    isAdmin ={this.state.isAdmin}
+                                    catalogueId = {this.state.catalogueId} 
                                     onExpand={this.handleOnExpand} 
                                     onSelect={this.handleOnSelect}
                                     onAddScheme = {this.onAddScheme}
@@ -234,6 +236,7 @@ class SchemeListBlock extends React.Component
         var data = new FormData();
         data.append('name', name);
         data.append('parentSchemeId', parentSchemeId);
+        data.append('catalogueId', this.props.catalogueId)
         data.append('image', imageFile);
 
         fetch(path, { 
@@ -1017,6 +1020,9 @@ ReactDOM.render(
         <PartsCatalogue/>,
 document.getElementById("root")
 );
+
+
+
 
 
 

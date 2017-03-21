@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Domain.Entities.Catalogue>
+@{
+    ViewBag.Title = "CatalogueList";
+}
+
+<h2>CatalogueList</h2>
+
+@Html.ActionLink("Добавить каталог", "AddCatalogue", null , new { @class = "btn btn-primary" })
+
+<table class="table table-condensed table-hover" style="width : 50%">
+    <tr>
+        <th>Название категории</th>
+        <th>Редактирование</th>
+    </tr>
+
+
+    @foreach (var catalog in Model)
+    {
+        <tr>
+            <td>@Html.ActionLink(catalog.Name, "Catalogue", new { id = catalog.Id })</td>
+            <td>
+                    @Html.ActionLink("Редактировать", "EditCatalogue", new { id = catalog.Id }, new { @class = "btn btn-success btn-sm" })
+                    @Html.ActionLink("Удалить", "DeleteCatalogue", new { id = catalog.Id }, new { @class = "btn btn-danger btn-sm" })
+                </td>
+        </tr>
+
+    }
+
+</table>
+

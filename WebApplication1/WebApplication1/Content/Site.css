@@ -16,3 +16,23 @@ textarea {
     max-width: 280px;
 }
 
+.schemeList
+{
+    overflow: auto;
+    /*overflow-x : visible;*/
+   /* overflow-y : auto;*/
+}
+
+
+.schemeList,
+.schemeInfoBlock
+{
+    height : calc(100vh - 204px);
+}
+
+.partListBlock
+{
+    height : calc(100vh - 204px - 530px);
+    overflow-y : auto;
+}
+

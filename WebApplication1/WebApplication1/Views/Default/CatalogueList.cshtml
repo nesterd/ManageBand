@@ -17,7 +17,7 @@
     @foreach (var catalog in Model)
     {
         <tr>
-            <td>@Html.ActionLink(catalog.Name, "Catalogue", new { id = catalog.Id })</td>
+            <td>@Html.ActionLink(catalog.Name, "Catalogue", new { id = catalog.Id, name = catalog.Name })</td>
             <td>
                     @Html.ActionLink("Редактировать", "EditCatalogue", new { id = catalog.Id }, new { @class = "btn btn-success btn-sm" })
                     @Html.ActionLink("Удалить", "DeleteCatalogue", new { id = catalog.Id }, new { @class = "btn btn-danger btn-sm" })

@@ -63,12 +63,14 @@ namespace WebApplication1.Controllers
             return View(_schemeService.GetCatalogueList());
         }
        
-        public ActionResult Catalogue(int id)
+        public ActionResult Catalogue(int id, string name)
         {
 
             ViewBag.SchemeListInJSON = _schemeService.GetSchemeListInJSON(id);
             ViewBag.SchemePartsListInJSON = _schemeService.GetSchemePartListInJSON(id);
             ViewBag.CatalogueId = id;
+            ViewBag.CatalogueName = name;
+            
             return View();
         }
 

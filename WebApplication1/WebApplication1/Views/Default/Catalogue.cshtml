@@ -12,10 +12,10 @@
     window.schemePartsList = @Html.Raw(schemePartsListJson)
 </script>
 
+<div id="myHeader"><h2>Каталог: "@ViewBag.CatalogueName"</h2></div>
 
-<h2>Parts Catalogue</h2>
 
-<div id="root" style="height : 100%"></div>
+<div id="root"></div>
 <script src="~/scripts/React/Release/vendor.js"></script>
 <script src="~/scripts/React/Release/index.js"></script>
 

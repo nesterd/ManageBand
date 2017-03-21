@@ -8,7 +8,8 @@ var Select = require('react-select');
 var FileInput = require('react-file-input');
 import 'react-select/dist/react-select.css';
 
-
+// var diff = document.getElementById('myHeader').style.height +  document.getElementById('myNav').style.height;
+// document.getElementById('myFooter').height +
 
 const ajaxRequest = (actionName, item, method, self) =>
     {
@@ -146,7 +147,7 @@ class PartsCatalogue extends React.Component
 
 
     render() {
-        return <div className="row">
+        return <div className="row" >
                    <SchemeListBlock schemeList={this.state.schemeList}
                                     isAdmin ={this.state.isAdmin}
                                     catalogueId = {this.state.catalogueId} 
@@ -319,7 +320,7 @@ class SchemeListBlock extends React.Component
 
     render()
     {
-        return <div className ="col-md-4">
+        return <div className ="col-md-4 schemeList"  >
                     {this.state.isAdmin ? <AddRootSchemeButton onAddRootSchemeButtonClick = {this.onAddRootSchemeButtonClick} /> : null}
                     {this.state.Scheme == null ? null : <DeleteSchemeModal show={this.state.DeleteSchemeModalShow}
                                                                                    onConfirmDeleteScheme = {this.onConfirmDeleteScheme}
@@ -629,8 +630,9 @@ class SelectButton extends React.Component
 
 
 const SchemeInfoBlock = (props) => 
-<div className="col-md-8">
-    <h2>{props.selectedSchemeName}</h2>
+<div className="col-md-8 schemeInfoBlock" >
+    {/*<h2>{props.selectedSchemeName}</h2>*/}
+    <h3>{props.selectedSchemeName} </h3>
     <PartListBlock isAdmin={props.isAdmin} 
                    onEditPart={props.onEditPart} 
                    schemeParts = {props.schemeParts} 
@@ -719,7 +721,7 @@ class PartListBlock extends React.Component
 
     render()
     {
-        return <div style = {{ height: 300}}>
+        return <div className="partListBlock">
                    {this.state.isAdmin ? <AddPartButton onAddPartButtonClick = {this.onAddPartButtonClick} /> : null}
                    <AddPartModal selectedSchemeName = {this.props.selectedSchemeName}
                                  onClose = {this.close}

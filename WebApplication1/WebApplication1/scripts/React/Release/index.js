@@ -26,6 +26,9 @@ webpackJsonp([0,1],[
 	var FileInput = __webpack_require__(/*! react-file-input */ 447);
 	
 	
+	// var diff = document.getElementById('myHeader').style.height +  document.getElementById('myNav').style.height;
+	// document.getElementById('myFooter').height +
+	
 	var ajaxRequest = function ajaxRequest(actionName, item, method, self) {
 	    var path = '/Default/' + actionName;
 	
@@ -330,7 +333,7 @@ webpackJsonp([0,1],[
 	        value: function render() {
 	            return React.createElement(
 	                'div',
-	                { className: 'col-md-4' },
+	                { className: 'col-md-4 schemeList' },
 	                this.state.isAdmin ? React.createElement(AddRootSchemeButton, { onAddRootSchemeButtonClick: this.onAddRootSchemeButtonClick }) : null,
 	                this.state.Scheme == null ? null : React.createElement(DeleteSchemeModal, { show: this.state.DeleteSchemeModalShow,
 	                    onConfirmDeleteScheme: this.onConfirmDeleteScheme,
@@ -823,11 +826,12 @@ webpackJsonp([0,1],[
 	var SchemeInfoBlock = function SchemeInfoBlock(props) {
 	    return React.createElement(
 	        'div',
-	        { className: 'col-md-8' },
+	        { className: 'col-md-8 schemeInfoBlock' },
 	        React.createElement(
-	            'h2',
+	            'h3',
 	            null,
-	            props.selectedSchemeName
+	            props.selectedSchemeName,
+	            ' '
 	        ),
 	        React.createElement(PartListBlock, { isAdmin: props.isAdmin,
 	            onEditPart: props.onEditPart,
@@ -924,7 +928,7 @@ webpackJsonp([0,1],[
 	        value: function render() {
 	            return React.createElement(
 	                'div',
-	                { style: { height: 300 } },
+	                { className: 'partListBlock' },
 	                this.state.isAdmin ? React.createElement(AddPartButton, { onAddPartButtonClick: this.onAddPartButtonClick }) : null,
 	                React.createElement(AddPartModal, { selectedSchemeName: this.props.selectedSchemeName,
 	                    onClose: this.close,

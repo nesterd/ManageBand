@@ -175,17 +175,11 @@ namespace BusinessLogic.Services
 
         public string AddScheme(Scheme scheme)
         {
+            string imagePath = GetSchemImagePath();
+            scheme.Image = imagePath;
             _context.Schemes.Add(scheme);
             _context.SaveChanges();
-
-            var addedScheme = _context.Schemes.ToArray().LastOrDefault();
-            //string fileName = Guid.NewGuid() + ".png";
-            addedScheme.Image = GetSchemImagePath();/*$"/images/{fileName}";*/
-
-            _context.Entry(addedScheme).State = System.Data.Entity.EntityState.Modified;
-            _context.SaveChanges();
-
-            return addedScheme.Image;
+            return imagePath;
 
         }
 
@@ -201,6 +195,8 @@ namespace BusinessLogic.Services
             List<Scheme> listToRemove = new List<Scheme>();
             AddSchemesToListToRemove(id, listToRemove, schemeTable);
             schemeTable.RemoveRange(listToRemove);
+            foreach (var scheme in listToRemove)
+                DeleteImage(scheme.Image);
             _context.SaveChanges();
         }
 
@@ -208,7 +204,6 @@ namespace BusinessLogic.Services
         {
             var schemeToRemove = tableInDb.Find(id);
             listToRemove.Add(schemeToRemove);
-            //var childsToRemove = schemeToRemove.Childs;
             var childsToRemove = tableInDb.Where(scheme => scheme.ParentId == id).ToList();
             if (childsToRemove.Count > 0)
             {
@@ -238,16 +233,21 @@ namespace BusinessLogic.Services
 
             if(isNewImage)
             {
-                var fullPath = HostingEnvironment.MapPath("~" + oldScheme.Image);
-                if (File.Exists(fullPath))
-                    File.Delete(fullPath);
-
+                DeleteImage(oldScheme.Image);
                 oldScheme.Image = GetSchemImagePath();
             }
             
             _context.SaveChanges();
 
             return oldScheme.Image;
+
+        }
+
+        void DeleteImage(string image)
+        {
+            var fullPath = HostingEnvironment.MapPath("~" + image);
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
 
         }
     }

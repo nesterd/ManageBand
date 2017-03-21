@@ -86,7 +86,6 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public ActionResult AddScheme()
         {
-            
             var parentSchemeId = Request["parentSchemeId"];
             int? parentId;
 
@@ -109,8 +108,8 @@ namespace WebApplication1.Controllers
             var id = int.Parse(Request["id"]);
             var isNewImage = Request.Files["image"] != null;
             var fileName = _schemeService.EditScheme(new Scheme { Id = id, Name = Request["name"] }, isNewImage);
-            if (isNewImage)
-                ImageLoader(fileName, Request);
+
+            ImageLoader(fileName, Request);
 
             return Json(_schemeService.GetSchemeById(id));
         }

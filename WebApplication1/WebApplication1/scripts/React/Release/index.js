@@ -440,7 +440,7 @@ webpackJsonp([0,1],[
 	                        null,
 	                        '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435:'
 	                    ),
-	                    React.createElement('input', { type: 'text', className: 'form-control', value: this.state.name, onChange: this.onChangeName }),
+	                    React.createElement('input', { type: 'text', className: 'form-control', autoFocus: true, value: this.state.name, onChange: this.onChangeName }),
 	                    React.createElement(
 	                        'label',
 	                        null,
@@ -537,7 +537,7 @@ webpackJsonp([0,1],[
 	                            null,
 	                            '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435:'
 	                        ),
-	                        React.createElement('input', { type: 'text', className: 'form-control', value: this.state.name, onChange: this.onChangeName })
+	                        React.createElement('input', { type: 'text', className: 'form-control', autoFocus: true, value: this.state.name, onChange: this.onChangeName })
 	                    ),
 	                    React.createElement(
 	                        'div',
@@ -1079,6 +1079,7 @@ webpackJsonp([0,1],[
 	                    ),
 	                    React.createElement(Select.AsyncCreatable, { multi: false,
 	                        value: this.state.article,
+	                        autofocus: true,
 	                        autoload: false,
 	                        promptTextCreator: function promptTextCreator(label) {
 	                            return 'Добавить новую деталь c артикулом: ' + '"' + label + '"';
@@ -1207,9 +1208,9 @@ webpackJsonp([0,1],[
 	                            React.createElement(
 	                                'label',
 	                                { htmlFor: 'inputPartCount' },
-	                                '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043D\u043E\u0432\u043E\u0435 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u0435:'
+	                                '\u041A\u043E\u043B-\u0432\u043E:'
 	                            ),
-	                            React.createElement('input', { type: 'number', value: this.state.count, className: 'form-control', onChange: this.onChange })
+	                            React.createElement('input', { type: 'number', autoFocus: true, value: this.state.count, className: 'form-control', onChange: this.onChange })
 	                        )
 	                    )
 	                ),

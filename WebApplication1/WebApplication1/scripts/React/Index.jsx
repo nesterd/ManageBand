@@ -411,7 +411,7 @@ class AddSchemeModal extends React.Component
                     <Modal.Body>
                         <p>{this.props.isRootScheme ? "корневая схема" : "дочерняя схема"}</p>
                         <h4>Название:</h4>
-                        <input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
+                        <input type="text" className="form-control" autoFocus={true} value ={this.state.name} onChange={this.onChangeName}/>
                         <label >Изображение:</label>
                         <input type="file"  onChange={this.onChangeImage}/>
                     </Modal.Body>
@@ -473,7 +473,7 @@ class EditSchemeModal extends React.Component
                         {/*<form >*/}
                             <div className="form-group">
                                 <label >Название:</label>
-                                <input type="text" className="form-control" value ={this.state.name} onChange={this.onChangeName}/>
+                                <input type="text" className="form-control" autoFocus={true} value ={this.state.name} onChange={this.onChangeName}/>
                             </div>
                             <div className="form-group">
                                 <label >Изображение:</label>
@@ -869,6 +869,7 @@ class AddPartModal extends React.Component
                             <label>Артикул:</label>
                             <Select.AsyncCreatable multi ={false} 
                                                    value ={this.state.article} 
+                                                   autofocus
                                                    autoload={false} 
                                                    promptTextCreator={(label) => 'Добавить новую деталь c артикулом: ' + '"'+label+'"'} 
                                                    onChange = {this.onChangeArticle}
@@ -926,8 +927,8 @@ class EditPartModal extends React.Component
                         <hr/>
                         <form role="form">
                             <div className="form-group">
-                                <label htmlFor="inputPartCount">Введите новое значение:</label>
-                                <input type="number" value ={this.state.count} className="form-control"  onChange = {this.onChange}/>
+                                <label htmlFor="inputPartCount">Кол-во:</label>
+                                <input type="number" autoFocus={true} value ={this.state.count} className="form-control"  onChange = {this.onChange}/>
                             </div>
                             
                         </form>
@@ -1004,7 +1005,8 @@ const EditPartButton = (props) => <button type="button" className="btn btn-succe
 const DeletePartButton = (props) => <button type="button" className="btn btn-danger" onClick={props.onDeletePartButtonClick.bind(this, props.schemePartId)}>Удалить</button>;
 
 
-class ImageBlock extends React.Component {
+class ImageBlock extends React.Component 
+{
     render() {
         return <img className="img-thumbnail" src={this.props.image} alt="Для данной схемы не задано изображение!"/>
         }

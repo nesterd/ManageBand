@@ -16,6 +16,11 @@ namespace Domain.Entities
 
         public int? ParentId { get; set; }
 
+        public int CatalogueId { get; set; }
+
+        [ForeignKey("CatalogueId")]
+        public virtual Catalogue Catalogue { get; set; }
+
         [ForeignKey("ParentId")]
         public virtual Scheme Parent { get; set; }
 

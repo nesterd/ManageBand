@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Base\BaseDbEntity.cs" />
+    <Compile Include="Entities\Catalogue.cs" />
     <Compile Include="Entities\Detail.cs" />
     <Compile Include="Entities\Scheme.cs" />
     <Compile Include="Entities\SchemePart.cs" />

@@ -17,6 +17,7 @@ namespace BusinessLogic.Context
 
         }
 
+        public virtual DbSet<Catalogue> Catalogue { get; set; }
         public virtual DbSet<Scheme> Schemes { get; set; }
         public virtual DbSet<Detail> Details { get; set; }
         public virtual DbSet<SchemePart> SchemeParts { get; set; }

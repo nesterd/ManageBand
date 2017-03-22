@@ -26,9 +26,6 @@ webpackJsonp([0,1],[
 	var FileInput = __webpack_require__(/*! react-file-input */ 447);
 	
 	
-	// var diff = document.getElementById('myHeader').style.height +  document.getElementById('myNav').style.height;
-	// document.getElementById('myFooter').height +
-	
 	var ajaxRequest = function ajaxRequest(actionName, item, method, self) {
 	    var path = '/Default/' + actionName;
 	
@@ -59,7 +56,7 @@ webpackJsonp([0,1],[
 	        var _this = _possibleConstructorReturn(this, (PartsCatalogue.__proto__ || Object.getPrototypeOf(PartsCatalogue)).call(this, props));
 	
 	        _this.state = {
-	            isAdmin: true,
+	            isAdmin: Boolean(window.isAdmin),
 	            schemeList: window.schemeList,
 	            schemaParts: window.schemePartsList,
 	            catalogueId: window.selectedCatalogueId
@@ -689,18 +686,22 @@ webpackJsonp([0,1],[
 	            return React.createElement(
 	                'li',
 	                null,
-	                React.createElement(ExpandButton, { onExpand: this.props.onExpand,
-	                    isExpand: this.props.isExpand,
-	                    index: this.props.index,
-	                    childs: this.props.childs }),
-	                React.createElement(SelectButton, { selectedSchemeId: this.props.selectedSchemeId,
-	                    name: this.props.name,
-	                    isAdmin: this.props.isAdmin,
-	                    onSelect: this.props.onSelect,
-	                    onAddSchemeButtonClick: this.props.onAddSchemeButtonClick,
-	                    onEditSchemeButtonClick: this.props.onEditSchemeButtonClick,
-	                    onDeleteSchemeButtonClick: this.props.onDeleteSchemeButtonClick,
-	                    index: this.props.index }),
+	                React.createElement(
+	                    'div',
+	                    { style: { whiteSpace: "nowrap" } },
+	                    React.createElement(ExpandButton, { onExpand: this.props.onExpand,
+	                        isExpand: this.props.isExpand,
+	                        index: this.props.index,
+	                        childs: this.props.childs }),
+	                    React.createElement(SelectButton, { selectedSchemeId: this.props.selectedSchemeId,
+	                        name: this.props.name,
+	                        isAdmin: this.props.isAdmin,
+	                        onSelect: this.props.onSelect,
+	                        onAddSchemeButtonClick: this.props.onAddSchemeButtonClick,
+	                        onEditSchemeButtonClick: this.props.onEditSchemeButtonClick,
+	                        onDeleteSchemeButtonClick: this.props.onDeleteSchemeButtonClick,
+	                        index: this.props.index })
+	                ),
 	                this.props.isExpand ? React.createElement(SchemeList, { schemeList: this.props.childs,
 	                    onSelect: this.props.onSelect,
 	                    isAdmin: this.props.isAdmin,
@@ -732,6 +733,7 @@ webpackJsonp([0,1],[
 	                'button',
 	                { type: 'button',
 	                    className: 'btn btn-link btn-xs',
+	                    style: { display: "inline-block" },
 	                    'aria-label': 'Left Align',
 	                    onClick: this.props.onExpand.bind(this, this.props.index) },
 	                React.createElement('span', { className: !this.props.isExpand ? "glyphicon glyphicon-plus" : "glyphicon glyphicon-minus",
@@ -750,22 +752,45 @@ webpackJsonp([0,1],[
 	var SelectButton = function (_React$Component8) {
 	    _inherits(SelectButton, _React$Component8);
 	
-	    function SelectButton() {
+	    function SelectButton(props) {
 	        _classCallCheck(this, SelectButton);
 	
-	        return _possibleConstructorReturn(this, (SelectButton.__proto__ || Object.getPrototypeOf(SelectButton)).apply(this, arguments));
+	        var _this11 = _possibleConstructorReturn(this, (SelectButton.__proto__ || Object.getPrototypeOf(SelectButton)).call(this, props));
+	
+	        _this11.state = {};
+	        return _this11;
 	    }
 	
 	    _createClass(SelectButton, [{
+	        key: 'calcButtonCoordinats',
+	        value: function calcButtonCoordinats() {
+	            var element = ReactDOM.findDOMNode(this.button);
+	            var elementCoordinats = element.getBoundingClientRect();
+	            var elementHeight = element.scrollHeight;
+	            var top = elementCoordinats.top + elementHeight;
+	            var left = elementCoordinats.left;
+	            console.log(elementHeight);
+	
+	            this.setState({
+	                style: { position: "fixed", top: top, left: left }
+	            });
+	        }
+	        // className="btn-group" style={{ whiteSpace : "nowrap"}}
+	        // style ={{ display : "inline-block"}}
+	
+	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var _this12 = this;
+	
 	            return React.createElement(
 	                'div',
-	                { className: 'btn-group' },
+	                { style: { whiteSpace: "nowrap", display: "inline-block" } },
 	                React.createElement(
 	                    'button',
 	                    { type: 'button',
 	                        className: "btn btn-" + (this.props.selectedSchemeId == this.props.index ? "success" : "default"),
+	
 	                        'aria-label': 'Left Align',
 	                        onClick: this.props.onSelect.bind(this, this.props.index) },
 	                    this.props.name
@@ -774,6 +799,11 @@ webpackJsonp([0,1],[
 	                    'button',
 	                    { type: 'button',
 	                        className: "btn btn-" + (this.props.selectedSchemeId == this.props.index ? "success" : "default") + " dropdown-toggle",
+	                        onClick: this.calcButtonCoordinats.bind(this),
+	                        ref: function ref(button) {
+	                            _this12.button = button;
+	                        },
+	
 	                        'data-toggle': 'dropdown',
 	                        'aria-haspopup': 'true',
 	                        'aria-expanded': 'false' },
@@ -786,7 +816,7 @@ webpackJsonp([0,1],[
 	                ) : null,
 	                React.createElement(
 	                    'ul',
-	                    { className: 'dropdown-menu' },
+	                    { className: 'dropdown-menu', style: this.state.style },
 	                    React.createElement(
 	                        'li',
 	                        null,
@@ -823,6 +853,8 @@ webpackJsonp([0,1],[
 	    return SelectButton;
 	}(React.Component);
 	
+	// style={{ position : "fixed"}}
+	
 	var SchemeInfoBlock = function SchemeInfoBlock(props) {
 	    return React.createElement(
 	        'div',
@@ -848,23 +880,23 @@ webpackJsonp([0,1],[
 	    function PartListBlock(props) {
 	        _classCallCheck(this, PartListBlock);
 	
-	        var _this12 = _possibleConstructorReturn(this, (PartListBlock.__proto__ || Object.getPrototypeOf(PartListBlock)).call(this, props));
+	        var _this13 = _possibleConstructorReturn(this, (PartListBlock.__proto__ || Object.getPrototypeOf(PartListBlock)).call(this, props));
 	
-	        _this12.state = {
+	        _this13.state = {
 	
-	            isAdmin: _this12.props.isAdmin,
+	            isAdmin: _this13.props.isAdmin,
 	            showAddModal: false,
 	            showEditModal: false,
 	            showDeleteModal: false
 	        };
-	        _this12.onEditPartButtonClick = _this12.onEditPartButtonClick.bind(_this12);
-	        _this12.onDeletePartButtonClick = _this12.onDeletePartButtonClick.bind(_this12);
-	        _this12.onAddPartButtonClick = _this12.onAddPartButtonClick.bind(_this12);
-	        _this12.close = _this12.close.bind(_this12);
-	        _this12.onConfirmEdit = _this12.onConfirmEdit.bind(_this12);
-	        _this12.onConfirmDelete = _this12.onConfirmDelete.bind(_this12);
-	        _this12.onConfirmAddSchemePart = _this12.onConfirmAddSchemePart.bind(_this12);
-	        return _this12;
+	        _this13.onEditPartButtonClick = _this13.onEditPartButtonClick.bind(_this13);
+	        _this13.onDeletePartButtonClick = _this13.onDeletePartButtonClick.bind(_this13);
+	        _this13.onAddPartButtonClick = _this13.onAddPartButtonClick.bind(_this13);
+	        _this13.close = _this13.close.bind(_this13);
+	        _this13.onConfirmEdit = _this13.onConfirmEdit.bind(_this13);
+	        _this13.onConfirmDelete = _this13.onConfirmDelete.bind(_this13);
+	        _this13.onConfirmAddSchemePart = _this13.onConfirmAddSchemePart.bind(_this13);
+	        return _this13;
 	    }
 	
 	    _createClass(PartListBlock, [{
@@ -963,23 +995,23 @@ webpackJsonp([0,1],[
 	    function AddPartModal(props) {
 	        _classCallCheck(this, AddPartModal);
 	
-	        var _this13 = _possibleConstructorReturn(this, (AddPartModal.__proto__ || Object.getPrototypeOf(AddPartModal)).call(this, props));
+	        var _this14 = _possibleConstructorReturn(this, (AddPartModal.__proto__ || Object.getPrototypeOf(AddPartModal)).call(this, props));
 	
-	        _this13.state = {
+	        _this14.state = {
 	            isNewOption: false,
 	            article: '',
 	            name: '',
 	            count: 0
 	        };
-	        _this13.onChangeArticle = _this13.onChangeArticle.bind(_this13);
-	        _this13.clear = _this13.clear.bind(_this13);
-	        _this13.onConfirm = _this13.onConfirm.bind(_this13);
-	        _this13.onChangeName = _this13.onChangeName.bind(_this13);
-	        _this13.onChangeCount = _this13.onChangeCount.bind(_this13);
-	        _this13.getArticles = _this13.getArticles.bind(_this13);
-	        _this13.onClose = _this13.onClose.bind(_this13);
-	        _this13.onNewOptionClick = _this13.onNewOptionClick.bind(_this13);
-	        return _this13;
+	        _this14.onChangeArticle = _this14.onChangeArticle.bind(_this14);
+	        _this14.clear = _this14.clear.bind(_this14);
+	        _this14.onConfirm = _this14.onConfirm.bind(_this14);
+	        _this14.onChangeName = _this14.onChangeName.bind(_this14);
+	        _this14.onChangeCount = _this14.onChangeCount.bind(_this14);
+	        _this14.getArticles = _this14.getArticles.bind(_this14);
+	        _this14.onClose = _this14.onClose.bind(_this14);
+	        _this14.onNewOptionClick = _this14.onNewOptionClick.bind(_this14);
+	        return _this14;
 	    }
 	
 	    _createClass(AddPartModal, [{
@@ -1137,13 +1169,13 @@ webpackJsonp([0,1],[
 	    function EditPartModal(props) {
 	        _classCallCheck(this, EditPartModal);
 	
-	        var _this14 = _possibleConstructorReturn(this, (EditPartModal.__proto__ || Object.getPrototypeOf(EditPartModal)).call(this, props));
+	        var _this15 = _possibleConstructorReturn(this, (EditPartModal.__proto__ || Object.getPrototypeOf(EditPartModal)).call(this, props));
 	
-	        _this14.state = {
-	            count: _this14.props.part.count
+	        _this15.state = {
+	            count: _this15.props.part.count
 	        };
-	        _this14.onChange = _this14.onChange.bind(_this14);
-	        return _this14;
+	        _this15.onChange = _this15.onChange.bind(_this15);
+	        return _this15;
 	    }
 	
 	    _createClass(EditPartModal, [{

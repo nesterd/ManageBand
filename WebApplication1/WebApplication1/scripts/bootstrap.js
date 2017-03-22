@@ -800,6 +800,8 @@ if (!jQuery) { throw new Error("Bootstrap requires jQuery") }
     return $parent && $parent.length ? $parent : $this.parent()
   }
 
+ 
+
 
   // DROPDOWN PLUGIN DEFINITION
   // ==========================

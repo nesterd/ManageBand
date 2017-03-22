@@ -4,12 +4,16 @@
     string schemeListJson = ViewBag.SchemeListInJSON;
     string schemePartsListJson = ViewBag.SchemePartsListInJSON;
     int catalogueId = ViewBag.CatalogueId;
+    bool isAdmin = ViewBag.IsAdmin;
 }
 
 <script>
-    window.selectedCatalogueId = @Html.Raw(catalogueId)
-    window.schemeList = @Html.Raw(schemeListJson)
-    window.schemePartsList = @Html.Raw(schemePartsListJson)
+    window.isAdmin = @Html.Raw(isAdmin.ToString().ToLower());
+    window.selectedCatalogueId = @Html.Raw(catalogueId);
+    window.schemeList = @Html.Raw(schemeListJson);
+    window.schemePartsList = @Html.Raw(schemePartsListJson);
+
+   
 </script>
 
 <div id="myHeader"><h2>Каталог: "@ViewBag.CatalogueName"</h2></div>

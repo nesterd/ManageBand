@@ -1,27 +1,39 @@
 ﻿@model IEnumerable<Domain.Entities.Catalogue>
 @{
     ViewBag.Title = "CatalogueList";
+    bool isAdmin = ViewBag.IsAdmin;
 }
 
 <h2>CatalogueList</h2>
 
-@Html.ActionLink("Добавить каталог", "AddCatalogue", null , new { @class = "btn btn-primary" })
+@if (isAdmin)
+{
+    @Html.ActionLink("Добавить каталог", "AddCatalogue", null, new { @class = "btn btn-primary" })
+}
+
 
 <table class="table table-condensed table-hover" style="width : 50%">
     <tr>
         <th>Название категории</th>
-        <th>Редактирование</th>
+        @if (isAdmin)
+        {
+            <th>Редактирование</th>
+        }
     </tr>
 
 
     @foreach (var catalog in Model)
     {
         <tr>
-            <td>@Html.ActionLink(catalog.Name, "Catalogue", new { id = catalog.Id, name = catalog.Name })</td>
-            <td>
+            <td>@Html.ActionLink(catalog.Name, "Catalogue", new { id = catalog.Id, name = catalog.Name, isAdmin = isAdmin })</td>
+            @if (isAdmin)
+            {
+                <td>
                     @Html.ActionLink("Редактировать", "EditCatalogue", new { id = catalog.Id }, new { @class = "btn btn-success btn-sm" })
                     @Html.ActionLink("Удалить", "DeleteCatalogue", new { id = catalog.Id }, new { @class = "btn btn-danger btn-sm" })
                 </td>
+            }
+            
         </tr>
 
     }

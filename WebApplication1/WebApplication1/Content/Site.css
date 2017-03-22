@@ -23,6 +23,10 @@ textarea {
    /* overflow-y : auto;*/
 }
 
+.scrollingTableBody
+{
+    
+}
 
 .schemeList,
 .schemeInfoBlock
@@ -35,4 +39,8 @@ textarea {
     height : calc(100vh - 204px - 530px);
     overflow-y : auto;
 }
+
+/*.dropdown-menu {
+    position : fixed;
+}*/
 

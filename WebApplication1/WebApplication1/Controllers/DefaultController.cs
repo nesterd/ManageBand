@@ -60,12 +60,14 @@ namespace WebApplication1.Controllers
 
         public ActionResult CatalogueList()
         {
+            ViewBag.IsAdmin = true;
+
             return View(_schemeService.GetCatalogueList());
         }
        
-        public ActionResult Catalogue(int id, string name)
+        public ActionResult Catalogue(int id, string name, bool isAdmin)
         {
-
+            ViewBag.IsAdmin = isAdmin;
             ViewBag.SchemeListInJSON = _schemeService.GetSchemeListInJSON(id);
             ViewBag.SchemePartsListInJSON = _schemeService.GetSchemePartListInJSON(id);
             ViewBag.CatalogueId = id;

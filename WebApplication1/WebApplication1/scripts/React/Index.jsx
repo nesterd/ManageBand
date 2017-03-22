@@ -8,8 +8,7 @@ var Select = require('react-select');
 var FileInput = require('react-file-input');
 import 'react-select/dist/react-select.css';
 
-// var diff = document.getElementById('myHeader').style.height +  document.getElementById('myNav').style.height;
-// document.getElementById('myFooter').height +
+
 
 const ajaxRequest = (actionName, item, method, self) =>
     {
@@ -46,7 +45,7 @@ class PartsCatalogue extends React.Component
         super(props);
         this.state = 
             {
-                isAdmin : true,
+                isAdmin : Boolean(window.isAdmin),
                 schemeList: window.schemeList,
                 schemaParts : window.schemePartsList,
                 catalogueId : window.selectedCatalogueId
@@ -552,7 +551,8 @@ class Scheme extends React.Component
     render()
     {
         return   <li>
-     <ExpandButton onExpand={this.props.onExpand}
+            <div style={{ whiteSpace : "nowrap"}}>
+<ExpandButton onExpand={this.props.onExpand}
                    isExpand={this.props.isExpand}
                    index={this.props.index} 
                    childs={this.props.childs}/>
@@ -565,6 +565,8 @@ class Scheme extends React.Component
                    onEditSchemeButtonClick = {this.props.onEditSchemeButtonClick}
                    onDeleteSchemeButtonClick ={this.props.onDeleteSchemeButtonClick} 
                    index={this.props.index} />
+            </div>
+     
 
     {this.props.isExpand ? 
     <SchemeList schemeList={this.props.childs} 
@@ -586,7 +588,8 @@ class ExpandButton extends React.Component
     {
         return this.props.childs.length > 0 ? 
         <button type="button" 
-                className="btn btn-link btn-xs" 
+                className="btn btn-link btn-xs"
+                style ={{ display : "inline-block"}} 
                 aria-label="Left Align" 
                 onClick={this.props.onExpand.bind(this, this.props.index) }>
                 <span className={!this.props.isExpand ? "glyphicon glyphicon-plus" : "glyphicon glyphicon-minus"} 
@@ -597,19 +600,51 @@ class ExpandButton extends React.Component
     }
 }
 
+
+
 class SelectButton extends React.Component 
 {
+    constructor(props)
+    {
+        super(props);
+        this.state =
+        {
+            
+        }
+    }
+    calcButtonCoordinats()
+    {
+        let element = ReactDOM.findDOMNode(this.button);
+        let elementCoordinats = element.getBoundingClientRect();
+        let elementHeight = element.scrollHeight;
+        let top = elementCoordinats.top + elementHeight;
+        let left = elementCoordinats.left
+        console.log(elementHeight);
+
+        this.setState
+        ({
+            style : { position : "fixed", top : top, left : left}
+        })
+
+
+    }
+// className="btn-group" style={{ whiteSpace : "nowrap"}}
+// style ={{ display : "inline-block"}}
     render()
     {
-        return <div className="btn-group">
+        return <div style={{ whiteSpace : "nowrap", display : "inline-block"}} >
                     <button type="button" 
                             className={"btn btn-" + (this.props.selectedSchemeId == this.props.index ? "success" : "default") }
+                            
                             aria-label="Left Align" 
                             onClick={this.props.onSelect.bind(this, this.props.index) }>
                             {this.props.name} 
                     </button>
                     {this.props.isAdmin ? <button type="button" 
                                                   className={"btn btn-"+ (this.props.selectedSchemeId == this.props.index ? "success" : "default")+" dropdown-toggle"}
+                                                  onClick ={this.calcButtonCoordinats.bind(this)}
+                                                  ref ={(button) => { this.button = button}}
+                                                  
                                                   data-toggle="dropdown" 
                                                   aria-haspopup="true" 
                                                   aria-expanded="false">
@@ -618,7 +653,7 @@ class SelectButton extends React.Component
                                          </button>
                     
                                          :null}
-                    <ul className="dropdown-menu">
+                    <ul className="dropdown-menu" style={this.state.style}>
                         <li><a href="#" onClick ={this.props.onAddSchemeButtonClick.bind(this, this.props.name, this.props.index)}>Добавить дочернюю схему</a></li>
                         <li><a href="#" onClick ={this.props.onEditSchemeButtonClick.bind(this, this.props.name, this.props.index)}>Редактировать</a></li>
                         <li role="separator" className="divider"></li>
@@ -628,6 +663,7 @@ class SelectButton extends React.Component
     }
 }
 
+// style={{ position : "fixed"}}
 
 const SchemeInfoBlock = (props) => 
 <div className="col-md-8 schemeInfoBlock" >
@@ -979,16 +1015,18 @@ const PartsTable = (props) =>
                 {props.isAdmin ? <td>Редактирование</td> : null}
             </tr>
         </thead>
-        <tbody>
-        {props.schemeParts.parts.map((part, index) => <Part name={part.name} 
-                                                                 count={part.count} 
-                                                                 article = {part.article}
-                                                                 schemePartId = {part.schemePartId}
-                                                                 onEditPartButtonClick ={props.onEditPartButtonClick}
-                                                                 onDeletePartButtonClick ={props.onDeletePartButtonClick}
-                                                                 key={index}
-                                                                 index={index}
-                                                                 isAdmin={props.isAdmin}/>)}
+        <tbody >
+            
+                    {props.schemeParts.parts.map((part, index) => <Part name={part.name} 
+                                                                            count={part.count} 
+                                                                            article = {part.article}
+                                                                            schemePartId = {part.schemePartId}
+                                                                            onEditPartButtonClick ={props.onEditPartButtonClick}
+                                                                            onDeletePartButtonClick ={props.onDeletePartButtonClick}
+                                                                            key={index}
+                                                                            index={index}
+                                                                            isAdmin={props.isAdmin}/>)}
+            
        </tbody>
  </table>;
 
@@ -1000,8 +1038,10 @@ const Part = (props) =>
                <td>{props.count}</td>
                {props.isAdmin ? 
                <td>
+                   
                    <EditPartButton onEditPartButtonClick ={props.onEditPartButtonClick} schemePartId={props.schemePartId}/>
                    <DeletePartButton onDeletePartButtonClick ={props.onDeletePartButtonClick} schemePartId={props.schemePartId}/>
+                   
                </td> :
                null}
    </tr>;
